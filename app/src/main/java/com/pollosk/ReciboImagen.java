@@ -70,10 +70,12 @@ public class ReciboImagen {
 
     private static Bitmap cargarLogo(Context ctx) {
         try {
-            // LEE EL LOGO QUE YA ESTÁ EN LA CARPETA DE LA APP
-            Bitmap logoOriginal = BitmapFactory.decodeResource(ctx.getResources(), R.drawable.logo_app);
+            // Carga tu logo transparente
+            Bitmap logoOriginal = BitmapFactory.decodeStream(ctx.getAssets().open("logo-recibo1.png"));
             if (logoOriginal == null) return null;
-            int nuevoAncho = 700; 
+            
+            // Lo escalamos a 300px (no 700), para que no se coma el recibo
+            int nuevoAncho = 300; 
             int nuevoAlto = (int) (((float) logoOriginal.getHeight() / logoOriginal.getWidth()) * nuevoAncho);
             return Bitmap.createScaledBitmap(logoOriginal, nuevoAncho, nuevoAlto, true);
         } catch (Exception e) {
@@ -82,10 +84,17 @@ public class ReciboImagen {
     }
 
     private static Bitmap dibujarRecibo(Context ctx, Venta v, List<ItemVenta> items) {
-        int alto = 400 + LINEA * (6 + items.size() + 6);
+        Bitmap logo = cargarLogo(ctx);
+        int altoLogo = (logo != null) ? logo.getHeight() + 40 : 100;
+        
+        // Calculamos la altura total del lienzo dinámicamente
+        int alto = 200 + altoLogo + LINEA * (6 + items.size() + 6);
+        
         Bitmap bmp = Bitmap.createBitmap(ANCHO, alto, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(bmp);
-        c.drawColor(Color.WHITE);
+        
+        // Fondo color crema para que combine con el logo
+        c.drawColor(Color.parseColor("#FFFDF5"));
 
         TextPaint ref        = paint(ctx, 34, false, Paint.Align.CENTER, false);
         TextPaint fecha      = paint(ctx, 26, false, Paint.Align.CENTER, false);
@@ -95,7 +104,6 @@ public class ReciboImagen {
         TextPaint negritaDer = paint(ctx, 32, true,  Paint.Align.RIGHT, false);
 
         int y = MARGEN + 20;
-        Bitmap logo = cargarLogo(ctx);
         if (logo != null) {
             c.drawBitmap(logo, (ANCHO - logo.getWidth()) / 2f, y, null);
             y += logo.getHeight() + 30;
@@ -137,10 +145,16 @@ public class ReciboImagen {
     }
 
     private static Bitmap dibujarRecordatorio(Context ctx, Venta v) {
-        int alto = 400 + LINEA * 11;
+        Bitmap logo = cargarLogo(ctx);
+        int altoLogo = (logo != null) ? logo.getHeight() + 40 : 100;
+        
+        int alto = 200 + altoLogo + LINEA * 11;
+        
         Bitmap bmp = Bitmap.createBitmap(ANCHO, alto, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(bmp);
-        c.drawColor(Color.WHITE);
+        
+        // Fondo color crema
+        c.drawColor(Color.parseColor("#FFFDF5"));
 
         TextPaint subtitulo  = paint(ctx, 28, false, Paint.Align.CENTER, false);
         TextPaint normal     = paint(ctx, 28, false, Paint.Align.LEFT, false);
@@ -148,7 +162,6 @@ public class ReciboImagen {
         TextPaint pie        = paint(ctx, 24, false, Paint.Align.CENTER, false);
 
         int y = MARGEN + 20;
-        Bitmap logo = cargarLogo(ctx);
         if (logo != null) {
             c.drawBitmap(logo, (ANCHO - logo.getWidth()) / 2f, y, null);
             y += logo.getHeight() + 20;
