@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/fondo"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/etPeso"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Peso en kilos (ej. 2.5)"
+            android:textColor="@color/texto"
+            android:textColorHint="@color/textoSuave"
+            android:inputType="numberDecimal"/>
+
+        <Button
+            android:id="@+id/btnAgregar"
+            style="@style/BotonPrincipal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Agregar"/>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvDisponibles"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="16dp"
+        android:textStyle="bold"
+        android:textColor="@color/acento"
+        android:text="Disponibles (0)"/>
+
+    <android.widget.ListView
+        android:id="@+id/lvDisponibles"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <TextView
+        android:id="@+id/tvVendidos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="16dp"
+        android:textStyle="bold"
+        android:textColor="@color/acento"
+        android:text="Vendidos (0)"/>
+
+    <android.widget.ListView
+        android:id="@+id/lvVendidos"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+</LinearLayout>
