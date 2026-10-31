@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28"/>
+
+    <application
+        android:label="Chicken"
+        android:icon="@drawable/logo_app"
+        android:theme="@style/AppTheme">
+        <activity android:name=".SplashActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+        <activity android:name=".MainActivity" />
+        <activity android:name=".InventarioActivity" android:label="Inventario" android:parentActivityName=".MainActivity"/>
+        <activity android:name=".VenderActivity" android:label="Registrar venta" android:parentActivityName=".MainActivity"/>
+        <activity android:name=".ReciboActivity" android:label="Recibo" android:parentActivityName=".MainActivity"/>
+        <activity android:name=".HistorialActivity" android:label="Historial" android:parentActivityName=".MainActivity"/>
+        <activity android:name=".EditarVentaActivity" android:label="Editar venta" android:parentActivityName=".HistorialActivity"/>
+        <activity android:name=".DeudasActivity" android:label="Deudas" android:parentActivityName=".MainActivity"/>
+        <activity android:name=".PagadosActivity" android:label="Pagados" android:parentActivityName=".MainActivity"/>
+        <activity android:name=".ResumenActivity" android:label="Resumen" android:parentActivityName=".MainActivity"/>
+        <activity android:name=".CierreActivity" android:label="Cierre" android:parentActivityName=".ResumenActivity"/>
+    </application>
+</manifest>
