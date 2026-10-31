@@ -29,19 +29,34 @@ public class ReciboImagen {
     private static final int MARGEN = 40;
     private static final int LINEA = 42;
 
-    public static Uri generarYGuardar(Context ctx, Venta v, List<ItemVenta> items) {
-        Bitmap bmp = dibujarRecibo(ctx, v, items);
-        return guardarEnCache(ctx, bmp, "recibo-" + v.referencia);
+    public static Bitmap generarBitmap(Context ctx, Venta v, List<ItemVenta> items) {
+        return dibujarRecibo(ctx, v, items);
+    }
+    
+    public static Bitmap generarBitmapRecordatorio(Context ctx, Venta v) {
+        return dibujarRecordatorio(ctx, v);
     }
 
-    public static Uri generarRecordatorio(Context ctx, Venta v) {
-        Bitmap bmp = dibujarRecordatorio(ctx, v);
-        return guardarEnCache(ctx, bmp, "recordatorio-" + v.referencia);
+    public static Uri guardarYCompartir(Context ctx, Bitmap bmp, String prefijo) {
+        try {
+            File cachePath = new File(ctx.getCacheDir(), "images");
+            cachePath.mkdirs();
+            String nombre = prefijo + "-" + new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(new Date()) + ".png";
+            File file = new File(cachePath, nombre);
+
+            FileOutputStream stream = new FileOutputStream(file);
+            bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            stream.close();
+
+            return FileProvider.getUriForFile(ctx, ctx.getPackageName() + ".fileprovider", file);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
-    private static TextPaint paint(Context ctx, int tamano, boolean bold, Paint.Align align) {
+    private static TextPaint paint(Context ctx, int tamano, boolean bold, Paint.Align align, boolean isRed) {
         TextPaint p = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        p.setColor(Color.parseColor("#240028"));
+        p.setColor(isRed ? Color.parseColor("#C62828") : Color.parseColor("#240028"));
         p.setTextSize(tamano);
         p.setTextAlign(align);
         try {
@@ -55,30 +70,14 @@ public class ReciboImagen {
         return p;
     }
 
-    private static Bitmap quitarFondoOscuro(Bitmap original) {
-        if (original == null) return null;
-        int width = original.getWidth();
-        int height = original.getHeight();
-        Bitmap bitmap = original.copy(Bitmap.Config.ARGB_8888, true);
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                int pixel = bitmap.getPixel(x, y);
-                if (Color.red(pixel) < 40 && Color.green(pixel) < 40 && Color.blue(pixel) < 40) {
-                    bitmap.setPixel(x, y, Color.TRANSPARENT);
-                }
-            }
-        }
-        return bitmap;
-    }
-
     private static Bitmap cargarLogo(Context ctx) {
         try {
-            Bitmap logoOriginal = BitmapFactory.decodeStream(ctx.getAssets().open("logo-recibo.png"));
+            Bitmap logoOriginal = BitmapFactory.decodeStream(ctx.getAssets().open("logo-recibo1.png"));
             if (logoOriginal == null) return null;
-            Bitmap logoSinFondo = quitarFondoOscuro(logoOriginal);
-            int nuevoAncho = 300;
-            int nuevoAlto = (int) (((float) logoSinFondo.getHeight() / logoSinFondo.getWidth()) * nuevoAncho);
-            return Bitmap.createScaledBitmap(logoSinFondo, nuevoAncho, nuevoAlto, true);
+            // Lo hacemos casi del ancho total del recibo (720px de 800px)
+            int nuevoAncho = 650; 
+            int nuevoAlto = (int) (((float) logoOriginal.getHeight() / logoOriginal.getWidth()) * nuevoAncho);
+            return Bitmap.createScaledBitmap(logoOriginal, nuevoAncho, nuevoAlto, true);
         } catch (Exception e) {
             return null;
         }
@@ -90,12 +89,12 @@ public class ReciboImagen {
         Canvas c = new Canvas(bmp);
         c.drawColor(Color.WHITE);
 
-        TextPaint ref        = paint(ctx, 34, false, Paint.Align.CENTER);
-        TextPaint fecha      = paint(ctx, 26, false, Paint.Align.CENTER);
-        TextPaint normal     = paint(ctx, 28, false, Paint.Align.LEFT);
-        TextPaint derecho    = paint(ctx, 28, false, Paint.Align.RIGHT);
-        TextPaint negrita    = paint(ctx, 30, true,  Paint.Align.LEFT);
-        TextPaint negritaDer = paint(ctx, 32, true,  Paint.Align.RIGHT);
+        TextPaint ref        = paint(ctx, 34, false, Paint.Align.CENTER, false);
+        TextPaint fecha      = paint(ctx, 26, false, Paint.Align.CENTER, false);
+        TextPaint normal     = paint(ctx, 28, false, Paint.Align.LEFT, false);
+        TextPaint derecho    = paint(ctx, 28, false, Paint.Align.RIGHT, false);
+        TextPaint negrita    = paint(ctx, 30, true,  Paint.Align.LEFT, false);
+        TextPaint negritaDer = paint(ctx, 32, true,  Paint.Align.RIGHT, false);
 
         int y = MARGEN + 20;
         Bitmap logo = cargarLogo(ctx);
@@ -145,10 +144,10 @@ public class ReciboImagen {
         Canvas c = new Canvas(bmp);
         c.drawColor(Color.WHITE);
 
-        TextPaint subtitulo  = paint(ctx, 28, false, Paint.Align.CENTER);
-        TextPaint normal     = paint(ctx, 28, false, Paint.Align.LEFT);
-        TextPaint monto      = paint(ctx, 44, true,  Paint.Align.CENTER);
-        TextPaint pie        = paint(ctx, 24, false, Paint.Align.CENTER);
+        TextPaint subtitulo  = paint(ctx, 28, false, Paint.Align.CENTER, false);
+        TextPaint normal     = paint(ctx, 28, false, Paint.Align.LEFT, false);
+        TextPaint montoRojo  = paint(ctx, 48, true,  Paint.Align.CENTER, true); // Monto en rojo
+        TextPaint pie        = paint(ctx, 24, false, Paint.Align.CENTER, false);
 
         int y = MARGEN + 20;
         Bitmap logo = cargarLogo(ctx);
@@ -171,29 +170,13 @@ public class ReciboImagen {
 
         c.drawText("Saldo pendiente", ANCHO / 2f, y, subtitulo);
         y += 60;
-        c.drawText(formatoCOP(v.total), ANCHO / 2f, y, monto);
+        c.drawText(formatoCOP(v.total), ANCHO / 2f, y, montoRojo);
         y += 80;
-        c.drawText("Por favor acercarse a cancelar.", ANCHO / 2f, y, pie);
+        
+        // Nueva frase
+        c.drawText("Agradecemos su pronto pago.", ANCHO / 2f, y, pie);
 
         return bmp;
-    }
-
-    // NUEVA FUNCIÓN: Guarda en caché en vez de la galería
-    private static Uri guardarEnCache(Context ctx, Bitmap bmp, String prefijo) {
-        try {
-            File cachePath = new File(ctx.getCacheDir(), "images");
-            cachePath.mkdirs();
-            String nombre = prefijo + "-" + new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(new Date()) + ".png";
-            File file = new File(cachePath, nombre);
-
-            FileOutputStream stream = new FileOutputStream(file);
-            bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            stream.close();
-
-            return FileProvider.getUriForFile(ctx, ctx.getPackageName() + ".fileprovider", file);
-        } catch (Exception e) {
-            return null;
-        }
     }
 
     public static void compartir(Context ctx, Uri uri, String referencia) {

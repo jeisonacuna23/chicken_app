@@ -83,13 +83,23 @@
             android:layout_marginTop="4dp"
             android:textColor="@color/texto"/>
 
+        <!-- Aquí se mostrará la previsualización de la imagen generada -->
+        <ImageView
+            android:id="@+id/ivPreviewRecibo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:adjustViewBounds="true"
+            android:background="#EEEEEE"
+            android:visibility="gone"/>
+
         <Button
             android:id="@+id/btnCompartir"
             style="@style/BotonPrincipal"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="24dp"
-            android:text="Compartir como imagen"/>
+            android:text="Generar y previsualizar recibo"/>
 
         <Button
             android:id="@+id/btnVolverMenu"

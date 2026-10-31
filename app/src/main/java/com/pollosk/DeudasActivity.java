@@ -2,6 +2,7 @@ package com.pollosk;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -60,8 +61,7 @@ public class DeudasActivity extends Activity {
             .setItems(opciones, (d, w) -> {
                 String metodo = opciones[w];
                 dao.marcarComoPagada(v.id, metodo);
-                Toast.makeText(this,
-                    "Pago registrado con " + metodo, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Pago registrado con " + metodo, Toast.LENGTH_SHORT).show();
                 refrescar();
             })
             .show();
@@ -69,12 +69,13 @@ public class DeudasActivity extends Activity {
 
     private void recordar(Venta v) {
         try {
-            Uri uri = ReciboImagen.generarRecordatorio(this, v);
-            if (uri == null) {
-                Toast.makeText(this, "No se pudo generar la imagen", Toast.LENGTH_LONG).show();
-                return;
+            Bitmap bmp = ReciboImagen.generarBitmapRecordatorio(this, v);
+            Uri uri = ReciboImagen.guardarYCompartir(this, bmp, "recordatorio-" + v.referencia);
+            if (uri != null) {
+                ReciboImagen.compartir(this, uri, v.referencia);
+            } else {
+                Toast.makeText(this, "No se pudo generar", Toast.LENGTH_LONG).show();
             }
-            ReciboImagen.compartir(this, uri, v.referencia);
         } catch (Exception e) {
             Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
@@ -91,8 +92,7 @@ public class DeudasActivity extends Activity {
 
         @Override
         public View getView(int pos, View cv, ViewGroup parent) {
-            if (cv == null) cv = LayoutInflater.from(getContext())
-                    .inflate(R.layout.item_deuda, parent, false);
+            if (cv == null) cv = LayoutInflater.from(getContext()).inflate(R.layout.item_deuda, parent, false);
             Venta v = getItem(pos);
 
             ((TextView) cv.findViewById(R.id.tvDeudaRef)).setText(v.referencia);
