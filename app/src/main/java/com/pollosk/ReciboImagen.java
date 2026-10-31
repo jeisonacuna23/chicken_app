@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -54,13 +55,24 @@ public class ReciboImagen {
         return p;
     }
 
+    private static Bitmap cargarLogo(Context ctx) {
+        try {
+            Bitmap logoOriginal = BitmapFactory.decodeStream(ctx.getAssets().open("logo-recibo.png"));
+            if (logoOriginal == null) return null;
+            int nuevoAncho = 250;
+            int nuevoAlto = (int) (((float) logoOriginal.getHeight() / logoOriginal.getWidth()) * nuevoAncho);
+            return Bitmap.createScaledBitmap(logoOriginal, nuevoAncho, nuevoAlto, true);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     private static Bitmap dibujarRecibo(Context ctx, Venta v, List<ItemVenta> items) {
         int alto = 200 + LINEA * (5 + items.size() + 6);
         Bitmap bmp = Bitmap.createBitmap(ANCHO, alto, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(bmp);
         c.drawColor(Color.parseColor("#FFE4EC"));
 
-        TextPaint titulo     = paint(ctx, 44, true,  Paint.Align.CENTER);
         TextPaint ref        = paint(ctx, 34, false, Paint.Align.CENTER);
         TextPaint fecha      = paint(ctx, 26, false, Paint.Align.CENTER);
         TextPaint normal     = paint(ctx, 28, false, Paint.Align.LEFT);
@@ -68,9 +80,16 @@ public class ReciboImagen {
         TextPaint negrita    = paint(ctx, 30, true,  Paint.Align.LEFT);
         TextPaint negritaDer = paint(ctx, 32, true,  Paint.Align.RIGHT);
 
-        int y = MARGEN + 50;
-        c.drawText("Venta de Pollos K", ANCHO / 2f, y, titulo);
-        y += 60;
+        int y = MARGEN + 20;
+        
+        Bitmap logo = cargarLogo(ctx);
+        if (logo != null) {
+            c.drawBitmap(logo, (ANCHO - logo.getWidth()) / 2f, y, null);
+            y += logo.getHeight() + 30;
+        } else {
+            y += 60;
+        }
+
         c.drawText(v.referencia, ANCHO / 2f, y, ref);
         y += 40;
         c.drawText(v.fecha, ANCHO / 2f, y, fecha);
@@ -112,16 +131,19 @@ public class ReciboImagen {
         Canvas c = new Canvas(bmp);
         c.drawColor(Color.parseColor("#FFE4EC"));
 
-        TextPaint titulo     = paint(ctx, 40, true,  Paint.Align.CENTER);
         TextPaint subtitulo  = paint(ctx, 28, false, Paint.Align.CENTER);
         TextPaint normal     = paint(ctx, 28, false, Paint.Align.LEFT);
-        TextPaint negrita    = paint(ctx, 32, true,  Paint.Align.LEFT);
         TextPaint monto      = paint(ctx, 44, true,  Paint.Align.CENTER);
         TextPaint pie        = paint(ctx, 24, false, Paint.Align.CENTER);
 
-        int y = MARGEN + 50;
-        c.drawText("Pollos K", ANCHO / 2f, y, titulo);
-        y += 50;
+        int y = MARGEN + 20;
+
+        Bitmap logo = cargarLogo(ctx);
+        if (logo != null) {
+            c.drawBitmap(logo, (ANCHO - logo.getWidth()) / 2f, y, null);
+            y += logo.getHeight() + 20;
+        }
+
         c.drawText("Recordatorio de pago", ANCHO / 2f, y, subtitulo);
         y += 60;
 
@@ -172,7 +194,7 @@ public class ReciboImagen {
         i.setType("image/png");
         i.putExtra(Intent.EXTRA_STREAM, uri);
         i.putExtra(Intent.EXTRA_SUBJECT, "Recibo " + referencia);
-        i.putExtra(Intent.EXTRA_TEXT, "Recibo " + referencia + " - Pollos K");
+        i.putExtra(Intent.EXTRA_TEXT, "Recibo " + referencia + " - Chicken");
         i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         ctx.startActivity(Intent.createChooser(i, "Compartir"));
     }
