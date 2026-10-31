@@ -55,13 +55,37 @@ public class ReciboImagen {
         return p;
     }
 
+    // Convierte los pixeles casi blancos en transparentes para quitar el fondo de la foto
+    private static Bitmap quitarFondoBlanco(Bitmap original) {
+        if (original == null) return null;
+        int width = original.getWidth();
+        int height = original.getHeight();
+        Bitmap bitmap = original.copy(Bitmap.Config.ARGB_8888, true);
+        
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                int pixel = bitmap.getPixel(x, y);
+                // Si el pixel es muy claro (cerca a blanco), lo hacemos transparente
+                if (Color.red(pixel) > 235 && Color.green(pixel) > 235 && Color.blue(pixel) > 235) {
+                    bitmap.setPixel(x, y, Color.TRANSPARENT);
+                }
+            }
+        }
+        return bitmap;
+    }
+
     private static Bitmap cargarLogo(Context ctx) {
         try {
             Bitmap logoOriginal = BitmapFactory.decodeStream(ctx.getAssets().open("logo-recibo.png"));
             if (logoOriginal == null) return null;
+            
+            // Le quitamos el fondo blanco
+            Bitmap logoSinFondo = quitarFondoBlanco(logoOriginal);
+            
+            // Lo escalamos a un tamaño adecuado (250 px de ancho)
             int nuevoAncho = 250;
-            int nuevoAlto = (int) (((float) logoOriginal.getHeight() / logoOriginal.getWidth()) * nuevoAncho);
-            return Bitmap.createScaledBitmap(logoOriginal, nuevoAncho, nuevoAlto, true);
+            int nuevoAlto = (int) (((float) logoSinFondo.getHeight() / logoSinFondo.getWidth()) * nuevoAncho);
+            return Bitmap.createScaledBitmap(logoSinFondo, nuevoAncho, nuevoAlto, true);
         } catch (Exception e) {
             return null;
         }
@@ -71,7 +95,9 @@ public class ReciboImagen {
         int alto = 200 + LINEA * (5 + items.size() + 6);
         Bitmap bmp = Bitmap.createBitmap(ANCHO, alto, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(bmp);
-        c.drawColor(Color.parseColor("#FFE4EC"));
+        
+        // CAMBIO: Fondo blanco como un recibo real
+        c.drawColor(Color.WHITE);
 
         TextPaint ref        = paint(ctx, 34, false, Paint.Align.CENTER);
         TextPaint fecha      = paint(ctx, 26, false, Paint.Align.CENTER);
@@ -129,7 +155,9 @@ public class ReciboImagen {
         int alto = 200 + LINEA * 9;
         Bitmap bmp = Bitmap.createBitmap(ANCHO, alto, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(bmp);
-        c.drawColor(Color.parseColor("#FFE4EC"));
+        
+        // CAMBIO: Fondo blanco también para el recordatorio
+        c.drawColor(Color.WHITE);
 
         TextPaint subtitulo  = paint(ctx, 28, false, Paint.Align.CENTER);
         TextPaint normal     = paint(ctx, 28, false, Paint.Align.LEFT);
