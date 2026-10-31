@@ -43,11 +43,9 @@ public class ReciboImagen {
             cachePath.mkdirs();
             String nombre = prefijo + "-" + new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(new Date()) + ".png";
             File file = new File(cachePath, nombre);
-
             FileOutputStream stream = new FileOutputStream(file);
             bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
             stream.close();
-
             return FileProvider.getUriForFile(ctx, ctx.getPackageName() + ".fileprovider", file);
         } catch (Exception e) {
             return null;
@@ -70,13 +68,11 @@ public class ReciboImagen {
         return p;
     }
 
-    // Carga el logo directo desde los recursos (el mismo del menú)
     private static Bitmap cargarLogo(Context ctx) {
         try {
+            // LEE EL LOGO QUE YA ESTÁ EN LA CARPETA DE LA APP
             Bitmap logoOriginal = BitmapFactory.decodeResource(ctx.getResources(), R.drawable.logo_app);
             if (logoOriginal == null) return null;
-            
-            // Lo hacemos que ocupe casi todo el ancho del recibo (700px de 800px)
             int nuevoAncho = 700; 
             int nuevoAlto = (int) (((float) logoOriginal.getHeight() / logoOriginal.getWidth()) * nuevoAncho);
             return Bitmap.createScaledBitmap(logoOriginal, nuevoAncho, nuevoAlto, true);
@@ -86,7 +82,7 @@ public class ReciboImagen {
     }
 
     private static Bitmap dibujarRecibo(Context ctx, Venta v, List<ItemVenta> items) {
-        int alto = 400 + LINEA * (6 + items.size() + 6); // Un poco más de alto por si el logo es grande
+        int alto = 400 + LINEA * (6 + items.size() + 6);
         Bitmap bmp = Bitmap.createBitmap(ANCHO, alto, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(bmp);
         c.drawColor(Color.WHITE);
@@ -174,7 +170,6 @@ public class ReciboImagen {
         y += 60;
         c.drawText(formatoCOP(v.total), ANCHO / 2f, y, montoRojo);
         y += 80;
-        
         c.drawText("Agradecemos su pronto pago.", ANCHO / 2f, y, pie);
 
         return bmp;
