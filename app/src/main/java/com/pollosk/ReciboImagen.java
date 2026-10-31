@@ -1,7 +1,5 @@
 package com.pollosk;
 
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -11,13 +9,15 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.text.TextPaint;
+
+import androidx.core.content.FileProvider;
 
 import com.pollosk.model.ItemVenta;
 import com.pollosk.model.Venta;
 
-import java.io.OutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -31,12 +31,12 @@ public class ReciboImagen {
 
     public static Uri generarYGuardar(Context ctx, Venta v, List<ItemVenta> items) {
         Bitmap bmp = dibujarRecibo(ctx, v, items);
-        return guardarEnGaleria(ctx, bmp, "recibo-" + v.referencia);
+        return guardarEnCache(ctx, bmp, "recibo-" + v.referencia);
     }
 
     public static Uri generarRecordatorio(Context ctx, Venta v) {
         Bitmap bmp = dibujarRecordatorio(ctx, v);
-        return guardarEnGaleria(ctx, bmp, "recordatorio-" + v.referencia);
+        return guardarEnCache(ctx, bmp, "recordatorio-" + v.referencia);
     }
 
     private static TextPaint paint(Context ctx, int tamano, boolean bold, Paint.Align align) {
@@ -55,17 +55,14 @@ public class ReciboImagen {
         return p;
     }
 
-    // AHORA QUITA EL FONDO OSCURO (NEGRO)
     private static Bitmap quitarFondoOscuro(Bitmap original) {
         if (original == null) return null;
         int width = original.getWidth();
         int height = original.getHeight();
         Bitmap bitmap = original.copy(Bitmap.Config.ARGB_8888, true);
-        
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 int pixel = bitmap.getPixel(x, y);
-                // Si el pixel es muy oscuro (cerca a negro), lo hacemos transparente
                 if (Color.red(pixel) < 40 && Color.green(pixel) < 40 && Color.blue(pixel) < 40) {
                     bitmap.setPixel(x, y, Color.TRANSPARENT);
                 }
@@ -78,11 +75,8 @@ public class ReciboImagen {
         try {
             Bitmap logoOriginal = BitmapFactory.decodeStream(ctx.getAssets().open("logo-recibo.png"));
             if (logoOriginal == null) return null;
-            
-            // Le quitamos el fondo negro
             Bitmap logoSinFondo = quitarFondoOscuro(logoOriginal);
-            
-            int nuevoAncho = 300; // Un poquito más grande
+            int nuevoAncho = 300;
             int nuevoAlto = (int) (((float) logoSinFondo.getHeight() / logoSinFondo.getWidth()) * nuevoAncho);
             return Bitmap.createScaledBitmap(logoSinFondo, nuevoAncho, nuevoAlto, true);
         } catch (Exception e) {
@@ -91,7 +85,6 @@ public class ReciboImagen {
     }
 
     private static Bitmap dibujarRecibo(Context ctx, Venta v, List<ItemVenta> items) {
-        // AUMENTAMOS EL ALTO PARA QUE NO SE CORTE NADA
         int alto = 300 + LINEA * (6 + items.size() + 6);
         Bitmap bmp = Bitmap.createBitmap(ANCHO, alto, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(bmp);
@@ -105,7 +98,6 @@ public class ReciboImagen {
         TextPaint negritaDer = paint(ctx, 32, true,  Paint.Align.RIGHT);
 
         int y = MARGEN + 20;
-        
         Bitmap logo = cargarLogo(ctx);
         if (logo != null) {
             c.drawBitmap(logo, (ANCHO - logo.getWidth()) / 2f, y, null);
@@ -118,7 +110,6 @@ public class ReciboImagen {
         y += 40;
         c.drawText(v.fecha, ANCHO / 2f, y, fecha);
         y += 50;
-
         c.drawLine(MARGEN, y, ANCHO - MARGEN, y, normal);
         y += 40;
 
@@ -143,15 +134,13 @@ public class ReciboImagen {
         c.drawText("TOTAL", MARGEN, y, negrita);
         c.drawText(formatoCOP(v.total), ANCHO - MARGEN, y, negritaDer);
         y += LINEA + 10;
-
         c.drawText("Metodo de pago: " + v.metodoPago, MARGEN, y, normal);
 
         return bmp;
     }
 
     private static Bitmap dibujarRecordatorio(Context ctx, Venta v) {
-        // AUMENTAMOS EL ALTO PARA QUE NO SE CORTE NADA
-        int alto = 300 + LINEA * 11; 
+        int alto = 300 + LINEA * 11;
         Bitmap bmp = Bitmap.createBitmap(ANCHO, alto, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(bmp);
         c.drawColor(Color.WHITE);
@@ -162,7 +151,6 @@ public class ReciboImagen {
         TextPaint pie        = paint(ctx, 24, false, Paint.Align.CENTER);
 
         int y = MARGEN + 20;
-
         Bitmap logo = cargarLogo(ctx);
         if (logo != null) {
             c.drawBitmap(logo, (ANCHO - logo.getWidth()) / 2f, y, null);
@@ -171,7 +159,6 @@ public class ReciboImagen {
 
         c.drawText("Recordatorio de pago", ANCHO / 2f, y, subtitulo);
         y += 60;
-
         c.drawLine(MARGEN, y, ANCHO - MARGEN, y, normal);
         y += 50;
 
@@ -186,29 +173,24 @@ public class ReciboImagen {
         y += 60;
         c.drawText(formatoCOP(v.total), ANCHO / 2f, y, monto);
         y += 80;
-
         c.drawText("Por favor acercarse a cancelar.", ANCHO / 2f, y, pie);
 
         return bmp;
     }
 
-    private static Uri guardarEnGaleria(Context ctx, Bitmap bmp, String prefijo) {
-        ContentValues cv = new ContentValues();
-        String nombre = prefijo + "-" +
-                new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(new Date()) + ".png";
-        cv.put(MediaStore.Images.Media.DISPLAY_NAME, nombre);
-        cv.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
-        cv.put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/PollosK");
-
-        ContentResolver cr = ctx.getContentResolver();
-        Uri uri = cr.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv);
-        if (uri == null) return null;
-
+    // NUEVA FUNCIÓN: Guarda en caché en vez de la galería
+    private static Uri guardarEnCache(Context ctx, Bitmap bmp, String prefijo) {
         try {
-            OutputStream os = cr.openOutputStream(uri);
-            bmp.compress(Bitmap.CompressFormat.PNG, 100, os);
-            if (os != null) os.close();
-            return uri;
+            File cachePath = new File(ctx.getCacheDir(), "images");
+            cachePath.mkdirs();
+            String nombre = prefijo + "-" + new SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(new Date()) + ".png";
+            File file = new File(cachePath, nombre);
+
+            FileOutputStream stream = new FileOutputStream(file);
+            bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            stream.close();
+
+            return FileProvider.getUriForFile(ctx, ctx.getPackageName() + ".fileprovider", file);
         } catch (Exception e) {
             return null;
         }

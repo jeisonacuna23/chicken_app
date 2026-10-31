@@ -1,12 +1,14 @@
 package com.pollosk;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.widget.Button;
-import android.widget.TextView;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.pollosk.db.DBHelper;
@@ -21,6 +23,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle b) {
         super.onCreate(b);
         setContentView(R.layout.activity_main);
+        
+        configurarActionBar();
 
         ((Button) findViewById(R.id.btnInventario)).setOnClickListener(v ->
                 startActivity(new Intent(this, InventarioActivity.class)));
@@ -34,10 +38,26 @@ public class MainActivity extends Activity {
                 startActivity(new Intent(this, PagadosActivity.class)));
         ((Button) findViewById(R.id.btnResumen)).setOnClickListener(v ->
                 startActivity(new Intent(this, ResumenActivity.class)));
+    }
 
-        // Modo test oculto: 3 toques rápidos sobre el título
-        TextView titulo = findViewById(R.id.tvTitulo);
-        if (titulo != null) titulo.setOnClickListener(v -> registrarToque());
+    private void configurarActionBar() {
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayShowTitleEnabled(false); // Quita el texto "Chicken" o "Pollos K"
+            actionBar.setDisplayShowCustomEnabled(true);
+            actionBar.setCustomView(R.layout.action_bar_custom);
+            
+            ImageView logoView = actionBar.getCustomView().findViewById(R.id.ivActionBarLogo);
+            try {
+                Drawable d = Drawable.createFromStream(getAssets().open("logo-recibo.png"), null);
+                logoView.setImageDrawable(d);
+            } catch (Exception e) {
+                // Si falla, no pasa nada
+            }
+            
+            // El truco de los 3 toques ahora va en el logo
+            logoView.setOnClickListener(v -> registrarToque());
+        }
     }
 
     private void registrarToque() {
@@ -57,8 +77,7 @@ public class MainActivity extends Activity {
     private void confirmarBorrado() {
         new AlertDialog.Builder(this)
             .setTitle("Modo test")
-            .setMessage("Se borrarán TODOS los datos: inventario, ventas, deudas y pagos. " +
-                    "Esta acción no se puede deshacer. ¿Continuar?")
+            .setMessage("Se borrarán TODOS los datos: inventario, ventas, deudas y pagos. ¿Continuar?")
             .setPositiveButton("Sí, borrar todo", (d, w) -> {
                 DBHelper db = DBHelper.get(this);
                 db.getWritableDatabase().delete("pollos", null, null);
