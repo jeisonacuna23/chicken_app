@@ -70,12 +70,14 @@ public class ReciboImagen {
         return p;
     }
 
+    // Carga el logo directo desde los recursos (el mismo del menú)
     private static Bitmap cargarLogo(Context ctx) {
         try {
-            Bitmap logoOriginal = BitmapFactory.decodeStream(ctx.getAssets().open("logo-recibo1.png"));
+            Bitmap logoOriginal = BitmapFactory.decodeResource(ctx.getResources(), R.drawable.logo_app);
             if (logoOriginal == null) return null;
-            // Lo hacemos casi del ancho total del recibo (720px de 800px)
-            int nuevoAncho = 650; 
+            
+            // Lo hacemos que ocupe casi todo el ancho del recibo (700px de 800px)
+            int nuevoAncho = 700; 
             int nuevoAlto = (int) (((float) logoOriginal.getHeight() / logoOriginal.getWidth()) * nuevoAncho);
             return Bitmap.createScaledBitmap(logoOriginal, nuevoAncho, nuevoAlto, true);
         } catch (Exception e) {
@@ -84,7 +86,7 @@ public class ReciboImagen {
     }
 
     private static Bitmap dibujarRecibo(Context ctx, Venta v, List<ItemVenta> items) {
-        int alto = 300 + LINEA * (6 + items.size() + 6);
+        int alto = 400 + LINEA * (6 + items.size() + 6); // Un poco más de alto por si el logo es grande
         Bitmap bmp = Bitmap.createBitmap(ANCHO, alto, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(bmp);
         c.drawColor(Color.WHITE);
@@ -139,14 +141,14 @@ public class ReciboImagen {
     }
 
     private static Bitmap dibujarRecordatorio(Context ctx, Venta v) {
-        int alto = 300 + LINEA * 11;
+        int alto = 400 + LINEA * 11;
         Bitmap bmp = Bitmap.createBitmap(ANCHO, alto, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(bmp);
         c.drawColor(Color.WHITE);
 
         TextPaint subtitulo  = paint(ctx, 28, false, Paint.Align.CENTER, false);
         TextPaint normal     = paint(ctx, 28, false, Paint.Align.LEFT, false);
-        TextPaint montoRojo  = paint(ctx, 48, true,  Paint.Align.CENTER, true); // Monto en rojo
+        TextPaint montoRojo  = paint(ctx, 48, true,  Paint.Align.CENTER, true);
         TextPaint pie        = paint(ctx, 24, false, Paint.Align.CENTER, false);
 
         int y = MARGEN + 20;
@@ -173,7 +175,6 @@ public class ReciboImagen {
         c.drawText(formatoCOP(v.total), ANCHO / 2f, y, montoRojo);
         y += 80;
         
-        // Nueva frase
         c.drawText("Agradecemos su pronto pago.", ANCHO / 2f, y, pie);
 
         return bmp;

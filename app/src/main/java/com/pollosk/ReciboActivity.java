@@ -3,7 +3,6 @@ package com.pollosk;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -74,17 +73,27 @@ public class ReciboActivity extends Activity {
     }
 
     private void generarPrevia() {
-        // Genera el bitmap de la imagen tal cual se verá
-        bitmapGenerado = ReciboImagen.generarBitmap(this, venta, items);
-        
-        ImageView preview = findViewById(R.id.ivPreviewRecibo);
-        preview.setImageBitmap(bitmapGenerado);
-        preview.setVisibility(View.VISIBLE);
+        try {
+            bitmapGenerado = ReciboImagen.generarBitmap(this, venta, items);
+            
+            if (bitmapGenerado == null) {
+                Toast.makeText(this, "Error: La imagen salió vacía", Toast.LENGTH_LONG).show();
+                return;
+            }
 
-        // Cambiamos el botón para que ahora sí comparta
-        Button btn = findViewById(R.id.btnCompartir);
-        btn.setText("Compartir por WhatsApp");
-        btn.setOnClickListener(v -> compartirImagen());
+            ImageView preview = findViewById(R.id.ivPreviewRecibo);
+            preview.setImageBitmap(bitmapGenerado);
+            preview.setVisibility(View.VISIBLE);
+
+            Button btn = findViewById(R.id.btnCompartir);
+            btn.setText("Compartir por WhatsApp");
+            btn.setOnClickListener(v -> compartirImagen());
+            
+            Toast.makeText(this, "Previa generada. Desliza hacia abajo para verla.", Toast.LENGTH_LONG).show();
+
+        } catch (Exception e) {
+            Toast.makeText(this, "Error al generar: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
     }
 
     private void compartirImagen() {
@@ -93,7 +102,7 @@ public class ReciboActivity extends Activity {
             if (uri != null) {
                 ReciboImagen.compartir(this, uri, venta.referencia);
             } else {
-                Toast.makeText(this, "Error al preparar imagen", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Error al preparar el archivo", Toast.LENGTH_SHORT).show();
             }
         }
     }
