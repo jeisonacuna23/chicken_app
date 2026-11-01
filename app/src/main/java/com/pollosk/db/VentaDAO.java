@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class VentaDAO {
     private final DBHelper helper;
@@ -119,13 +120,15 @@ public class VentaDAO {
         return n;
     }
 
-    /**
-     * Genera la siguiente referencia con formato VP-K{YY}-{NNNN}.
-     * Ej: VP-K25-0001, VP-K25-0002, ...
-     */
     public String generarReferencia() {
-        String yy = new SimpleDateFormat("yy", Locale.US).format(new Date());
-        String prefijo = "VP-K" + yy + "-";
+        TimeZone tz = TimeZone.getTimeZone("America/Caracas");
+        SimpleDateFormat sdf = new SimpleDateFormat("yy", Locale.US);
+        sdf.setTimeZone(tz);
+        String yy = sdf.format(new Date());
+        
+        // CAMBIO: Ahora genera K26- en vez de VP-K26-
+        String prefijo = "K" + yy + "-";
+        
         Cursor c = helper.getReadableDatabase().rawQuery(
                 "SELECT MAX(referencia) FROM ventas WHERE referencia LIKE ?",
                 new String[]{prefijo + "%"});
@@ -140,13 +143,12 @@ public class VentaDAO {
         return prefijo + String.format(Locale.US, "%04d", siguiente);
     }
 
-    /**
-     * Reinicia el contador de referencias del año en curso.
-     * Se usa al cerrar la jornada.
-     */
     public void reiniciarContador() {
-        String yy = new SimpleDateFormat("yy", Locale.US).format(new Date());
-        String prefijo = "VP-K" + yy + "-";
+        TimeZone tz = TimeZone.getTimeZone("America/Caracas");
+        SimpleDateFormat sdf = new SimpleDateFormat("yy", Locale.US);
+        sdf.setTimeZone(tz);
+        String yy = sdf.format(new Date());
+        String prefijo = "K" + yy + "-";
         helper.getWritableDatabase().delete("ventas",
                 "referencia LIKE ?", new String[]{prefijo + "%"});
     }

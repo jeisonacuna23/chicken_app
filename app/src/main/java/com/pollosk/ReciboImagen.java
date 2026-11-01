@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -25,9 +26,9 @@ import java.util.Locale;
 
 public class ReciboImagen {
 
-    private static final int ANCHO = 800;
+    private static final int ANCHO = 600; // Un poco más angosto, como un recibo real
     private static final int MARGEN = 40;
-    private static final int LINEA = 42;
+    private static final int LINEA = 40;
 
     public static Bitmap generarBitmap(Context ctx, Venta v, List<ItemVenta> items) {
         return dibujarRecibo(ctx, v, items);
@@ -54,7 +55,7 @@ public class ReciboImagen {
 
     private static TextPaint paint(Context ctx, int tamano, boolean bold, Paint.Align align, boolean isRed) {
         TextPaint p = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        p.setColor(isRed ? Color.parseColor("#C62828") : Color.parseColor("#240028"));
+        p.setColor(isRed ? Color.parseColor("#C62828") : Color.parseColor("#333333"));
         p.setTextSize(tamano);
         p.setTextAlign(align);
         try {
@@ -68,14 +69,21 @@ public class ReciboImagen {
         return p;
     }
 
+    // Lápiz para dibujar las líneas punteadas
+    private static Paint paintPunteado() {
+        Paint p = new Paint();
+        p.setColor(Color.parseColor("#333333"));
+        p.setStyle(Paint.Style.STROKE);
+        p.setStrokeWidth(2f);
+        p.setPathEffect(new DashPathEffect(new float[]{8, 8}, 0));
+        return p;
+    }
+
     private static Bitmap cargarLogo(Context ctx) {
         try {
-            // Carga tu logo transparente
             Bitmap logoOriginal = BitmapFactory.decodeStream(ctx.getAssets().open("logo-recibo1.png"));
             if (logoOriginal == null) return null;
-            
-            // Lo escalamos a 300px (no 700), para que no se coma el recibo
-            int nuevoAncho = 300; 
+            int nuevoAncho = 200; // Tamaño mediano para un recibo
             int nuevoAlto = (int) (((float) logoOriginal.getHeight() / logoOriginal.getWidth()) * nuevoAncho);
             return Bitmap.createScaledBitmap(logoOriginal, nuevoAncho, nuevoAlto, true);
         } catch (Exception e) {
@@ -85,104 +93,112 @@ public class ReciboImagen {
 
     private static Bitmap dibujarRecibo(Context ctx, Venta v, List<ItemVenta> items) {
         Bitmap logo = cargarLogo(ctx);
-        int altoLogo = (logo != null) ? logo.getHeight() + 40 : 100;
-        
-        // Calculamos la altura total del lienzo dinámicamente
-        int alto = 200 + altoLogo + LINEA * (6 + items.size() + 6);
+        int altoLogo = (logo != null) ? logo.getHeight() + 30 : 60;
+        int alto = 250 + altoLogo + LINEA * (5 + items.size() + 5);
         
         Bitmap bmp = Bitmap.createBitmap(ANCHO, alto, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(bmp);
-        
-        // Fondo color crema para que combine con el logo
-        c.drawColor(Color.parseColor("#FFFDF5"));
+        c.drawColor(Color.WHITE);
 
-        TextPaint ref        = paint(ctx, 34, false, Paint.Align.CENTER, false);
-        TextPaint fecha      = paint(ctx, 26, false, Paint.Align.CENTER, false);
-        TextPaint normal     = paint(ctx, 28, false, Paint.Align.LEFT, false);
-        TextPaint derecho    = paint(ctx, 28, false, Paint.Align.RIGHT, false);
-        TextPaint negrita    = paint(ctx, 30, true,  Paint.Align.LEFT, false);
-        TextPaint negritaDer = paint(ctx, 32, true,  Paint.Align.RIGHT, false);
+        Paint punteado = paintPunteado();
 
-        int y = MARGEN + 20;
+        TextPaint ref        = paint(ctx, 28, false, Paint.Align.CENTER, false);
+        TextPaint fecha      = paint(ctx, 22, false, Paint.Align.CENTER, false);
+        TextPaint normal     = paint(ctx, 24, false, Paint.Align.LEFT, false);
+        TextPaint derecho    = paint(ctx, 24, false, Paint.Align.RIGHT, false);
+        TextPaint negrita    = paint(ctx, 26, true,  Paint.Align.LEFT, false);
+        TextPaint negritaDer = paint(ctx, 34, true,  Paint.Align.RIGHT, false);
+
+        int y = MARGEN + 10;
         if (logo != null) {
             c.drawBitmap(logo, (ANCHO - logo.getWidth()) / 2f, y, null);
-            y += logo.getHeight() + 30;
-        } else {
-            y += 60;
+            y += logo.getHeight() + 20;
         }
 
-        c.drawText(v.referencia, ANCHO / 2f, y, ref);
-        y += 40;
+        // Referencia abreviada
+        c.drawText("Ref: " + v.referencia, ANCHO / 2f, y, ref);
+        y += 30;
         c.drawText(v.fecha, ANCHO / 2f, y, fecha);
-        y += 50;
-        c.drawLine(MARGEN, y, ANCHO - MARGEN, y, normal);
         y += 40;
+
+        c.drawLine(MARGEN, y, ANCHO - MARGEN, y, punteado);
+        y += 30;
 
         c.drawText("Cliente: " + v.cliente, MARGEN, y, normal);
         y += LINEA;
-        c.drawText("Precio por kilo: " + formatoCOP(v.precioKg), MARGEN, y, normal);
+        c.drawText("Precio Kg: " + formatoCOP(v.precioKg), MARGEN, y, normal);
         y += LINEA + 10;
 
-        c.drawText("Detalle", MARGEN, y, negrita);
+        c.drawText("CANT / PESO", MARGEN, y, negrita);
+        c.drawText("SUBTOTAL", ANCHO - MARGEN, y, paint(ctx, 26, true, Paint.Align.RIGHT, false));
         y += LINEA;
+        
+        c.drawLine(MARGEN, y, ANCHO - MARGEN, y, punteado);
+        y += 20;
 
         for (ItemVenta it : items) {
-            c.drawText(String.format(Locale.US, "%.2f kg", it.pesoKg), MARGEN, y, normal);
+            c.drawText(String.format(Locale.US, "1 x %.2f kg", it.pesoKg), MARGEN, y, normal);
             c.drawText(formatoCOP(it.subtotal), ANCHO - MARGEN, y, derecho);
             y += LINEA;
         }
 
         y += 10;
-        c.drawLine(MARGEN, y, ANCHO - MARGEN, y, normal);
-        y += 50;
+        c.drawLine(MARGEN, y, ANCHO - MARGEN, y, punteado);
+        y += 40;
 
-        c.drawText("TOTAL", MARGEN, y, negrita);
+        c.drawText("TOTAL", MARGEN, y, paint(ctx, 32, true, Paint.Align.LEFT, false));
         c.drawText(formatoCOP(v.total), ANCHO - MARGEN, y, negritaDer);
         y += LINEA + 10;
-        c.drawText("Metodo de pago: " + v.metodoPago, MARGEN, y, normal);
+        
+        c.drawText("Pago: " + v.metodoPago, MARGEN, y, normal);
+        y += LINEA + 20;
+
+        c.drawText("¡Gracias por su compra!", ANCHO / 2f, y, ref);
 
         return bmp;
     }
 
     private static Bitmap dibujarRecordatorio(Context ctx, Venta v) {
         Bitmap logo = cargarLogo(ctx);
-        int altoLogo = (logo != null) ? logo.getHeight() + 40 : 100;
-        
-        int alto = 200 + altoLogo + LINEA * 11;
+        int altoLogo = (logo != null) ? logo.getHeight() + 30 : 60;
+        int alto = 250 + altoLogo + LINEA * 9;
         
         Bitmap bmp = Bitmap.createBitmap(ANCHO, alto, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(bmp);
-        
-        // Fondo color crema
-        c.drawColor(Color.parseColor("#FFFDF5"));
+        c.drawColor(Color.WHITE);
 
-        TextPaint subtitulo  = paint(ctx, 28, false, Paint.Align.CENTER, false);
-        TextPaint normal     = paint(ctx, 28, false, Paint.Align.LEFT, false);
-        TextPaint montoRojo  = paint(ctx, 48, true,  Paint.Align.CENTER, true);
-        TextPaint pie        = paint(ctx, 24, false, Paint.Align.CENTER, false);
+        Paint punteado = paintPunteado();
 
-        int y = MARGEN + 20;
+        TextPaint subtitulo  = paint(ctx, 26, false, Paint.Align.CENTER, false);
+        TextPaint normal     = paint(ctx, 24, false, Paint.Align.LEFT, false);
+        TextPaint montoRojo  = paint(ctx, 46, true,  Paint.Align.CENTER, true);
+        TextPaint pie        = paint(ctx, 20, false, Paint.Align.CENTER, false);
+
+        int y = MARGEN + 10;
         if (logo != null) {
             c.drawBitmap(logo, (ANCHO - logo.getWidth()) / 2f, y, null);
             y += logo.getHeight() + 20;
         }
 
         c.drawText("Recordatorio de pago", ANCHO / 2f, y, subtitulo);
-        y += 60;
-        c.drawLine(MARGEN, y, ANCHO - MARGEN, y, normal);
         y += 50;
+        c.drawLine(MARGEN, y, ANCHO - MARGEN, y, punteado);
+        y += 40;
 
         c.drawText("Cliente: " + v.cliente, MARGEN, y, normal);
         y += LINEA + 6;
-        c.drawText("Referencia: " + v.referencia, MARGEN, y, normal);
+        c.drawText("Ref: " + v.referencia, MARGEN, y, normal);
         y += LINEA + 6;
         c.drawText("Fecha: " + v.fecha, MARGEN, y, normal);
         y += LINEA + 30;
 
         c.drawText("Saldo pendiente", ANCHO / 2f, y, subtitulo);
-        y += 60;
+        y += 50;
         c.drawText(formatoCOP(v.total), ANCHO / 2f, y, montoRojo);
-        y += 80;
+        y += 60;
+        
+        c.drawLine(MARGEN, y, ANCHO - MARGEN, y, punteado);
+        y += 30;
         c.drawText("Agradecemos su pronto pago.", ANCHO / 2f, y, pie);
 
         return bmp;

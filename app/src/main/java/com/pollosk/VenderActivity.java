@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class VenderActivity extends Activity {
 
@@ -143,7 +144,13 @@ public class VenderActivity extends Activity {
         v.cliente = cliente;
         v.precioKg = precio;
         v.metodoPago = metodo;
-        v.fecha = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US).format(new Date());
+        
+        // CAMBIO: Fecha con zona horaria de Venezuela y formato 12h
+        TimeZone tz = TimeZone.getTimeZone("America/Caracas");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.US);
+        sdf.setTimeZone(tz);
+        v.fecha = sdf.format(new Date());
+        
         v.total = total;
 
         long ventaId = ventaDAO.insertar(v);
