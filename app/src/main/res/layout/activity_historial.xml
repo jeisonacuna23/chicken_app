@@ -6,16 +6,31 @@
     android:orientation="vertical"
     android:padding="8dp">
 
-    <EditText
-        android:id="@+id/etBuscarHistorial"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Buscar por cliente..."
-        android:inputType="textPersonName"
-        android:padding="12dp"
-        android:textColor="@color/texto"
-        android:textColorHint="@color/textoSuave"
-        android:layout_marginBottom="8dp"/>
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+
+        <EditText
+            android:id="@+id/etBuscarHistorial"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Buscar por cliente..."
+            android:inputType="textPersonName"
+            android:padding="12dp"
+            android:textColor="@color/texto"
+            android:textColorHint="@color/textoSuave"/>
+
+        <Button
+            android:id="@+id/btnExportarExcel"
+            style="@style/BotonPrincipal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Exportar"/>
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tvHistorialVacio"

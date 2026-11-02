@@ -52,6 +52,17 @@ public class HistorialActivity extends Activity {
             public void onTextChanged(CharSequence s, int a, int b, int c) { refrescar(); }
             public void afterTextChanged(Editable s) {}
         });
+
+        // Botón de exportar
+        findViewById(R.id.btnExportarExcel).setOnClickListener(v -> {
+            List<Venta> todasLasVentas = ventaDAO.listarTodas();
+            if (todasLasVentas.isEmpty()) {
+                Toast.makeText(this, "No hay ventas para exportar", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            // Exporta TODAS las ventas, sin importar la búsqueda actual
+            ExportHelper.exportarVentas(this, todasLasVentas);
+        });
     }
 
     @Override
@@ -82,14 +93,13 @@ public class HistorialActivity extends Activity {
                 polloDAO.devolverAlInventario(v.id);
                 itemDAO.eliminarPorVenta(v.id);
                 ventaDAO.eliminar(v.id);
-                toast("Venta eliminada.");
+                Toast.makeText(this, "Venta eliminada", Toast.LENGTH_SHORT).show();
                 refrescar();
             })
             .setNegativeButton("Cancelar", null)
             .show();
     }
 
-    private void toast(String m) { Toast.makeText(this, m, Toast.LENGTH_SHORT).show(); }
     private String formatoCOP(double n) { return String.format(Locale.US, "$%,.0f", n).replace(',', '.'); }
 
     private class Adaptador extends ArrayAdapter<Venta> {
