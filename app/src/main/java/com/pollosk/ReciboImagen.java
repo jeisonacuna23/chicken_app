@@ -137,7 +137,7 @@ public class ReciboImagen {
         y += 20;
 
         for (ItemVenta it : items) {
-            c.drawText(String.format(Locale.US, "1 x %.2f kg", it.pesoKg), MARGEN, y, normal);
+            c.drawText(String.format(Locale.US, "1 x %.3f kg", it.pesoKg), MARGEN, y, normal);
             c.drawText(formatoCOP(it.subtotal), ANCHO - MARGEN, y, derecho);
             y += LINEA;
         }

@@ -60,7 +60,7 @@ public class InventarioActivity extends Activity {
 
         dao.insertar(peso);
         etPeso.setText("");
-        toast("Pollo agregado: " + String.format(Locale.US, "%.2f kg", peso));
+        toast("Pollo agregado: " + String.format(Locale.US, "%.3f kg", peso));
         refrescar();
     }
 
@@ -68,7 +68,7 @@ public class InventarioActivity extends Activity {
         new AlertDialog.Builder(this)
             .setTitle("Eliminar pollo")
             .setMessage(String.format(Locale.US,
-                    "Se eliminará el pollo de %.2f kg del inventario. ¿Continuar?", p.pesoKg))
+                    "Se eliminará el pollo de %.3f kg del inventario. ¿Continuar?", p.pesoKg))
             .setPositiveButton("Sí, eliminar", (d, w) -> {
                 dao.eliminar(p.id);
                 toast("Pollo eliminado");
@@ -110,7 +110,7 @@ public class InventarioActivity extends Activity {
             TextView tvPeso = convertView.findViewById(R.id.tvPesoItem);
             TextView tvEstado = convertView.findViewById(R.id.tvEstadoItem);
 
-            tvPeso.setText(String.format(Locale.US, "%.2f kg", p.pesoKg));
+            tvPeso.setText(String.format(Locale.US, "%.3f kg", p.pesoKg));
             tvEstado.setText(esVendido ? "Vendido" : "Disponible");
             return convertView;
         }

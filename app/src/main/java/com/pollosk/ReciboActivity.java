@@ -54,7 +54,7 @@ public class ReciboActivity extends Activity {
         for (ItemVenta it : items) {
             View fila = inf.inflate(R.layout.item_linea_recibo, cont, false);
             ((TextView) fila.findViewById(R.id.tvLineaPeso)).setText(
-                    String.format(Locale.US, "• %.2f kg", it.pesoKg));
+                    String.format(Locale.US, "• %.3f kg", it.pesoKg));
             ((TextView) fila.findViewById(R.id.tvLineaSubtotal)).setText(formatoCOP(it.subtotal));
             cont.addView(fila);
         }

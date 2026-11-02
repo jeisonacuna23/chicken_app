@@ -37,7 +37,7 @@ public class CierreActivity extends Activity {
         ((TextView) findViewById(R.id.tvCierrePollos)).setText(
                 "Pollos vendidos: " + cantidadPollos);
         ((TextView) findViewById(R.id.tvCierrePeso)).setText(
-                "Peso total: " + String.format(Locale.US, "%.2f kg", pesoTotal));
+                "Peso total: " + String.format(Locale.US, "%.3f kg", pesoTotal));
         ((TextView) findViewById(R.id.tvCierreTotal)).setText(
                 "Monto total: " + formatoCOP(montoTotal));
 
@@ -76,7 +76,7 @@ public class CierreActivity extends Activity {
                 "CIERRE DE JORNADA - POLLOS K\n" +
                 "Fecha: " + fechaCierre + "\n" +
                 "Pollos vendidos: " + cantidadPollos + "\n" +
-                "Peso total: " + String.format(Locale.US, "%.2f", pesoTotal) + " kg\n" +
+                "Peso total: " + String.format(Locale.US, "%.3f", pesoTotal) + " kg\n" +
                 "Monto total: " + formatoCOP(montoTotal) + "\n";
     }
 

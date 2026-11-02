@@ -59,7 +59,7 @@ public class EditarVentaActivity extends Activity {
             et.setHint("Peso en kg");
             et.setInputType(android.text.InputType.TYPE_CLASS_NUMBER
                     | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
-            et.setText(String.format(Locale.US, "%.2f", it.pesoKg));
+            et.setText(String.format(Locale.US, "%.3f", it.pesoKg));
             et.addTextChangedListener(new TextWatcher() {
                 public void beforeTextChanged(CharSequence s, int a, int b, int c) {}
                 public void onTextChanged(CharSequence s, int a, int b, int c) { recalcular(); }

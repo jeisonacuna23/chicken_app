@@ -91,7 +91,7 @@ public class VenderActivity extends Activity {
 
         for (Pollo p : pollosDisponibles) {
             CheckBox cb = new CheckBox(this);
-            cb.setText(String.format(Locale.US, "%.2f kg", p.pesoKg));
+            cb.setText(String.format(Locale.US, "%.3f kg", p.pesoKg));
             cb.setTag(p.id);
             cb.setOnCheckedChangeListener((v, c) -> actualizarTotal());
             llPollos.addView(cb);
