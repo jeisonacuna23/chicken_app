@@ -9,6 +9,8 @@ public class SessionManager {
     private static final String PREF_NAME = "ChickenSession";
     private static final String KEY_IS_LOGGED_IN = "isLoggedIn";
     private static final String KEY_PASSWORD = "appPassword";
+    private static final String KEY_QUESTION = "securityQuestion";
+    private static final String KEY_ANSWER = "securityAnswer";
 
     public SessionManager(Context context) {
         pref = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
@@ -35,6 +37,20 @@ public class SessionManager {
 
     public boolean checkPassword(String password) {
         return pref.getString(KEY_PASSWORD, "").equals(password);
+    }
+
+    public void setSecurityQA(String question, String answer) {
+        editor.putString(KEY_QUESTION, question);
+        editor.putString(KEY_ANSWER, answer.toLowerCase().trim());
+        editor.apply();
+    }
+
+    public String getSecurityQuestion() {
+        return pref.getString(KEY_QUESTION, "");
+    }
+
+    public boolean checkAnswer(String answer) {
+        return pref.getString(KEY_ANSWER, "").equals(answer.toLowerCase().trim());
     }
 
     public void logout() {

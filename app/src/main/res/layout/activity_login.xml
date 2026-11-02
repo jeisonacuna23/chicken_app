@@ -1,67 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/fondo"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="32dp">
-
-    <ImageView
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_marginBottom="24dp"
-        android:src="@drawable/logo_app"
-        android:scaleType="fitCenter"/>
-
-    <TextView
-        android:id="@+id/tvLoginTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Ingrese su PIN"
-        android:textColor="@color/acento"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="16dp"/>
-
-    <!-- PIN: inputType="numberPassword" -->
-    <EditText
-        android:id="@+id/etPassword"
+    android:background="@color/fondo">
+    
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="PIN numérico"
-        android:inputType="numberPassword"
-        android:maxLength="10"
-        android:padding="16dp"
-        android:background="@android:drawable/edit_text"/>
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="32dp">
 
-    <EditText
-        android:id="@+id/etConfirmPassword"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:hint="Confirmar PIN"
-        android:inputType="numberPassword"
-        android:maxLength="10"
-        android:visibility="gone"
-        android:padding="16dp"
-        android:background="@android:drawable/edit_text"/>
+        <ImageView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_marginBottom="24dp"
+            android:src="@drawable/logo_app"
+            android:scaleType="centerInside"/>
 
-    <Button
-        android:id="@+id/btnEntrar"
-        style="@style/BotonPrincipal"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:layout_marginTop="24dp"
-        android:text="Ingresar"/>
+        <TextView
+            android:id="@+id/tvLoginTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ingrese su PIN"
+            android:textColor="@color/acento"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"/>
 
-    <!-- Botón de Huella -->
-    <Button
-        android:id="@+id/btnHuella"
-        style="@style/BotonPrincipal"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:layout_marginTop="12dp"
-        android:text="Usar Huella"
-        android:visibility="gone"/>
-</LinearLayout>
+        <EditText
+            android:id="@+id/etPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="PIN numérico"
+            android:inputType="numberPassword"
+            android:maxLength="10"
+            android:padding="16dp"
+            android:background="@android:drawable/edit_text"/>
+
+        <EditText
+            android:id="@+id/etConfirmPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="Confirmar PIN"
+            android:inputType="numberPassword"
+            android:maxLength="10"
+            android:visibility="gone"
+            android:padding="16dp"
+            android:background="@android:drawable/edit_text"/>
+
+        <!-- Pregunta de Seguridad (Solo se ve al crear) -->
+        <Spinner
+            android:id="@+id/spinnerPregunta"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="16dp"
+            android:visibility="gone"/>
+
+        <EditText
+            android:id="@+id/etRespuesta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="Su respuesta secreta"
+            android:inputType="text"
+            android:visibility="gone"
+            android:padding="16dp"
+            android:background="@android:drawable/edit_text"/>
+
+        <Button
+            android:id="@+id/btnEntrar"
+            style="@style/BotonPrincipal"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="24dp"
+            android:text="Ingresar"/>
+
+        <Button
+            android:id="@+id/btnHuella"
+            style="@style/BotonPrincipal"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="12dp"
+            android:text="Usar Huella"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/tvOlvidePin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Olvidé mi PIN"
+            android:textColor="@color/textoSuave"
+            android:textStyle="bold"
+            android:visibility="gone"/>
+    </LinearLayout>
+</ScrollView>

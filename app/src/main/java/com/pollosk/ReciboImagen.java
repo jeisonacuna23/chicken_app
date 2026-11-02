@@ -26,7 +26,7 @@ import java.util.Locale;
 
 public class ReciboImagen {
 
-    private static final int ANCHO = 600; // Un poco más angosto, como un recibo real
+    private static final int ANCHO = 600;
     private static final int MARGEN = 40;
     private static final int LINEA = 40;
 
@@ -69,7 +69,6 @@ public class ReciboImagen {
         return p;
     }
 
-    // Lápiz para dibujar las líneas punteadas
     private static Paint paintPunteado() {
         Paint p = new Paint();
         p.setColor(Color.parseColor("#333333"));
@@ -83,7 +82,7 @@ public class ReciboImagen {
         try {
             Bitmap logoOriginal = BitmapFactory.decodeStream(ctx.getAssets().open("logo-recibo1.png"));
             if (logoOriginal == null) return null;
-            int nuevoAncho = 200; // Tamaño mediano para un recibo
+            int nuevoAncho = 200;
             int nuevoAlto = (int) (((float) logoOriginal.getHeight() / logoOriginal.getWidth()) * nuevoAncho);
             return Bitmap.createScaledBitmap(logoOriginal, nuevoAncho, nuevoAlto, true);
         } catch (Exception e) {
@@ -115,7 +114,6 @@ public class ReciboImagen {
             y += logo.getHeight() + 20;
         }
 
-        // Referencia abreviada
         c.drawText("Ref: " + v.referencia, ANCHO / 2f, y, ref);
         y += 30;
         c.drawText(v.fecha, ANCHO / 2f, y, fecha);
@@ -204,12 +202,13 @@ public class ReciboImagen {
         return bmp;
     }
 
-    public static void compartir(Context ctx, Uri uri, String referencia) {
+    // AHORA RECIBE UN TEXTO PERSONALIZADO
+    public static void compartir(Context ctx, Uri uri, String referencia, String textoExtra) {
         Intent i = new Intent(Intent.ACTION_SEND);
         i.setType("image/png");
         i.putExtra(Intent.EXTRA_STREAM, uri);
         i.putExtra(Intent.EXTRA_SUBJECT, "Recibo " + referencia);
-        i.putExtra(Intent.EXTRA_TEXT, "Recibo " + referencia + " - Chicken");
+        i.putExtra(Intent.EXTRA_TEXT, textoExtra);
         i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         ctx.startActivity(Intent.createChooser(i, "Compartir"));
     }

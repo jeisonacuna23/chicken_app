@@ -85,7 +85,8 @@ public class DeudasActivity extends Activity {
             Bitmap bmp = ReciboImagen.generarBitmapRecordatorio(this, v);
             Uri uri = ReciboImagen.guardarYCompartir(this, bmp, "recordatorio-" + v.referencia);
             if (uri != null) {
-                ReciboImagen.compartir(this, uri, v.referencia);
+                // TEXTO PERSONALIZADO AQUÍ
+                ReciboImagen.compartir(this, uri, v.referencia, "Karen Acuña Nequi: 3025656772");
             } else {
                 Toast.makeText(this, "No se pudo generar", Toast.LENGTH_LONG).show();
             }

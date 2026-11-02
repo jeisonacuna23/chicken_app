@@ -46,15 +46,13 @@ public class ReciboActivity extends Activity {
         ((TextView) findViewById(R.id.tvReciboRef)).setText(venta.referencia);
         ((TextView) findViewById(R.id.tvReciboFecha)).setText(venta.fecha);
         ((TextView) findViewById(R.id.tvReciboCliente)).setText("Cliente: " + venta.cliente);
-        ((TextView) findViewById(R.id.tvReciboPrecio)).setText(
-                "Precio por kilo: " + formatoCOP(venta.precioKg));
+        ((TextView) findViewById(R.id.tvReciboPrecio)).setText("Precio por kilo: " + formatoCOP(venta.precioKg));
 
         LinearLayout cont = findViewById(R.id.llItems);
         LayoutInflater inf = LayoutInflater.from(this);
         for (ItemVenta it : items) {
             View fila = inf.inflate(R.layout.item_linea_recibo, cont, false);
-            ((TextView) fila.findViewById(R.id.tvLineaPeso)).setText(
-                    String.format(Locale.US, "• %.3f kg", it.pesoKg));
+            ((TextView) fila.findViewById(R.id.tvLineaPeso)).setText(String.format(Locale.US, "• %.3f kg", it.pesoKg));
             ((TextView) fila.findViewById(R.id.tvLineaSubtotal)).setText(formatoCOP(it.subtotal));
             cont.addView(fila);
         }
@@ -77,7 +75,7 @@ public class ReciboActivity extends Activity {
             bitmapGenerado = ReciboImagen.generarBitmap(this, venta, items);
             
             if (bitmapGenerado == null) {
-                Toast.makeText(this, "Error: La imagen salió vacía", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Error: No se pudo generar la imagen", Toast.LENGTH_LONG).show();
                 return;
             }
 
@@ -92,7 +90,7 @@ public class ReciboActivity extends Activity {
             Toast.makeText(this, "Previa generada. Desliza hacia abajo para verla.", Toast.LENGTH_LONG).show();
 
         } catch (Exception e) {
-            Toast.makeText(this, "Error al generar: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -100,14 +98,13 @@ public class ReciboActivity extends Activity {
         if (bitmapGenerado != null) {
             Uri uri = ReciboImagen.guardarYCompartir(this, bitmapGenerado, "recibo-" + venta.referencia);
             if (uri != null) {
-                ReciboImagen.compartir(this, uri, venta.referencia);
+                // TEXTO POR DEFECTO DEL RECIBO
+                ReciboImagen.compartir(this, uri, venta.referencia, "Recibo " + venta.referencia + " - Chicken");
             } else {
                 Toast.makeText(this, "Error al preparar el archivo", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    private String formatoCOP(double n) {
-        return String.format(Locale.US, "$%,.0f", n).replace(',', '.');
-    }
+    private String formatoCOP(double n) { return String.format(Locale.US, "$%,.0f", n).replace(',', '.'); }
 }
