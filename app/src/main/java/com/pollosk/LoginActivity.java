@@ -3,10 +3,17 @@ package com.pollosk;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.biometric.BiometricManager;
+import androidx.biometric.BiometricPrompt;
+import androidx.core.content.ContextCompat;
+
+import java.util.concurrent.Executor;
 
 public class LoginActivity extends Activity {
 
@@ -24,47 +31,93 @@ public class LoginActivity extends Activity {
         etPassword = findViewById(R.id.etPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
         TextView tvTitle = findViewById(R.id.tvLoginTitle);
+        Button btnHuella = findViewById(R.id.btnHuella);
 
-        // Si es la primera vez, pedimos crear contraseña
+        // Si es la primera vez, pedimos crear el PIN
         if (!session.hasPassword()) {
             isSettingUp = true;
-            tvTitle.setText("Cree una contraseña para proteger sus datos");
-            etConfirmPassword.setVisibility(android.view.View.VISIBLE);
+            tvTitle.setText("Cree un PIN para proteger sus datos");
+            etConfirmPassword.setVisibility(View.VISIBLE);
+            btnHuella.setVisibility(View.GONE);
+        } else {
+            // Si ya tiene PIN, verificamos si el celular soporta huella
+            BiometricManager biometricManager = BiometricManager.from(this);
+            int canAuthenticate = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.BIOMETRIC_WEAK);
+            
+            if (canAuthenticate == BiometricManager.BIOMETRIC_SUCCESS) {
+                btnHuella.setVisibility(View.VISIBLE);
+            }
         }
 
-        ((Button) findViewById(R.id.btnEntrar)).setOnClickListener(v -> procesar());
+        ((Button) findViewById(R.id.btnEntrar)).setOnClickListener(v -> procesarPIN());
+        btnHuella.setOnClickListener(v -> mostrarDialogoHuella());
     }
 
-    private void procesar() {
+    private void procesarPIN() {
         String pass = etPassword.getText().toString().trim();
         if (pass.isEmpty()) {
-            Toast.makeText(this, "Ingrese una contraseña", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Ingrese su PIN", Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (isSettingUp) {
             String confirm = etConfirmPassword.getText().toString().trim();
             if (pass.length() < 4) {
-                Toast.makeText(this, "Debe tener al menos 4 caracteres", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "El PIN debe tener al menos 4 números", Toast.LENGTH_SHORT).show();
                 return;
             }
             if (!pass.equals(confirm)) {
-                Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Los PIN no coinciden", Toast.LENGTH_SHORT).show();
                 return;
             }
             session.setPassword(pass);
             session.setLogin(true);
-            Toast.makeText(this, "Contraseña creada", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "PIN creado exitosamente", Toast.LENGTH_SHORT).show();
             irAlMenu();
         } else {
             if (session.checkPassword(pass)) {
                 session.setLogin(true);
                 irAlMenu();
             } else {
-                Toast.makeText(this, "Contraseña incorrecta", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "PIN incorrecto", Toast.LENGTH_SHORT).show();
                 etPassword.setText("");
             }
         }
+    }
+
+    private void mostrarDialogoHuella() {
+        Executor executor = ContextCompat.getMainExecutor(this);
+        
+        BiometricPrompt biometricPrompt = new BiometricPrompt(LoginActivity.this,
+                executor, new BiometricPrompt.AuthenticationCallback() {
+            @Override
+            public void onAuthenticationError(int errorCode, CharSequence errString) {
+                super.onAuthenticationError(errorCode, errString);
+                Toast.makeText(getApplicationContext(), "Error: " + errString, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) {
+                super.onAuthenticationSucceeded(result);
+                session.setLogin(true);
+                Toast.makeText(getApplicationContext(), "Huella reconocida", Toast.LENGTH_SHORT).show();
+                irAlMenu();
+            }
+
+            @Override
+            public void onAuthenticationFailed() {
+                super.onAuthenticationFailed();
+                Toast.makeText(getApplicationContext(), "Huella no reconocida, intente de nuevo", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
+                .setTitle("Inicio de Sesión")
+                .setSubtitle("Usa tu huella dactilar para entrar")
+                .setNegativeButtonText("Usar PIN")
+                .build();
+
+        biometricPrompt.authenticate(promptInfo);
     }
 
     private void irAlMenu() {

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="28"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28"/>
+    <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
+    <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
 
     <application
         android:label="Chicken"
@@ -25,10 +26,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        
-        <!-- Nueva pantalla de Login -->
         <activity android:name=".LoginActivity" android:exported="false" />
-        
         <activity android:name=".MainActivity" />
         <activity android:name=".InventarioActivity" android:label="Inventario" android:parentActivityName=".MainActivity"/>
         <activity android:name=".VenderActivity" android:label="Registrar venta" android:parentActivityName=".MainActivity"/>
