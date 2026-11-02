@@ -1,6 +1,5 @@
 package com.pollosk;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -12,10 +11,11 @@ import android.widget.Toast;
 import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
 
 import java.util.concurrent.Executor;
 
-public class LoginActivity extends Activity {
+public class LoginActivity extends FragmentActivity {
 
     private SessionManager session;
     private EditText etPassword, etConfirmPassword;
@@ -33,14 +33,12 @@ public class LoginActivity extends Activity {
         TextView tvTitle = findViewById(R.id.tvLoginTitle);
         Button btnHuella = findViewById(R.id.btnHuella);
 
-        // Si es la primera vez, pedimos crear el PIN
         if (!session.hasPassword()) {
             isSettingUp = true;
             tvTitle.setText("Cree un PIN para proteger sus datos");
             etConfirmPassword.setVisibility(View.VISIBLE);
             btnHuella.setVisibility(View.GONE);
         } else {
-            // Si ya tiene PIN, verificamos si el celular soporta huella
             BiometricManager biometricManager = BiometricManager.from(this);
             int canAuthenticate = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG | BiometricManager.Authenticators.BIOMETRIC_WEAK);
             
