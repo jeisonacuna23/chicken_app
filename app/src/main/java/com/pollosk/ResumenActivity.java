@@ -36,6 +36,8 @@ public class ResumenActivity extends Activity {
         tvCantidad = findViewById(R.id.tvResumenCantidad);
 
         ((Button) findViewById(R.id.btnFinalizar)).setOnClickListener(v -> intentarFinalizar());
+        ((Button) findViewById(R.id.btnVerCierres)).setOnClickListener(v -> 
+                startActivity(new Intent(this, HistorialCierresActivity.class)));
     }
 
     @Override
@@ -62,18 +64,9 @@ public class ResumenActivity extends Activity {
         int deudas = ventaDAO.listarDeudas().size();
         int ventas = ventaDAO.contarTodas();
 
-        if (disponibles > 0) {
-            toast("Aún quedan " + disponibles + " pollo(s) disponible(s) sin vender.");
-            return;
-        }
-        if (deudas > 0) {
-            toast("Hay " + deudas + " deuda(s) pendiente(s).");
-            return;
-        }
-        if (ventas == 0) {
-            toast("No hay ventas registradas.");
-            return;
-        }
+        if (disponibles > 0) { toast("Aún quedan " + disponibles + " pollo(s) sin vender."); return; }
+        if (deudas > 0) { toast("Hay " + deudas + " deuda(s) pendiente(s)."); return; }
+        if (ventas == 0) { toast("No hay ventas registradas."); return; }
 
         new AlertDialog.Builder(this)
             .setTitle("Finalizar jornada")

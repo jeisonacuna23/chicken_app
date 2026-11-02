@@ -37,5 +37,7 @@
         <activity android:name=".PagadosActivity" android:label="Pagados" android:parentActivityName=".MainActivity"/>
         <activity android:name=".ResumenActivity" android:label="Resumen" android:parentActivityName=".MainActivity"/>
         <activity android:name=".CierreActivity" android:label="Cierre" android:parentActivityName=".ResumenActivity"/>
+        <!-- NUEVA ACTIVITY -->
+        <activity android:name=".HistorialCierresActivity" android:label="Cierres" android:parentActivityName=".ResumenActivity"/>
     </application>
 </manifest>

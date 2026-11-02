@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DBHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "pollosk.db";
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 2; // Subimos a la versión 2
     private static DBHelper instance;
 
     public static synchronized DBHelper get(Context ctx) {
@@ -41,10 +41,25 @@ public class DBHelper extends SQLiteOpenHelper {
                 "pollo_id INTEGER NOT NULL," +
                 "peso_kg REAL NOT NULL," +
                 "subtotal REAL NOT NULL)");
+                
+        // Nueva tabla para el historial de cierres
+        db.execSQL("CREATE TABLE cierres (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "fecha TEXT NOT NULL," +
+                "cantidad_pollos INTEGER NOT NULL," +
+                "peso_total REAL NOT NULL," +
+                "monto_total REAL NOT NULL)");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // v1, sin migraciones todavía
+        if (oldVersion < 2) {
+            db.execSQL("CREATE TABLE cierres (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "fecha TEXT NOT NULL," +
+                "cantidad_pollos INTEGER NOT NULL," +
+                "peso_total REAL NOT NULL," +
+                "monto_total REAL NOT NULL)");
+        }
     }
 }
