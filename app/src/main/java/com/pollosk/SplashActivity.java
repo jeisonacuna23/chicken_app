@@ -13,8 +13,15 @@ public class SplashActivity extends Activity {
         setContentView(R.layout.activity_splash);
 
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            startActivity(new Intent(this, MainActivity.class));
+            SessionManager session = new SessionManager(this);
+            Intent i;
+            if (session.isLoggedIn()) {
+                i = new Intent(this, MainActivity.class);
+            } else {
+                i = new Intent(this, LoginActivity.class);
+            }
+            startActivity(i);
             finish();
-        }, 2000);
+        }, 1500); // 1.5 segundos
     }
 }

@@ -25,6 +25,10 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        
+        <!-- Nueva pantalla de Login -->
+        <activity android:name=".LoginActivity" android:exported="false" />
+        
         <activity android:name=".MainActivity" />
         <activity android:name=".InventarioActivity" android:label="Inventario" android:parentActivityName=".MainActivity"/>
         <activity android:name=".VenderActivity" android:label="Registrar venta" android:parentActivityName=".MainActivity"/>

@@ -1,20 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Color crema del fondo del logo -->
     <color name="fondo">#FCF8F2</color>
-    
-    <!-- Rojo vino oscuro de la letra K -->
-    <color name="acento">#8B1C29</color>
-    
-    <!-- El mismo rojo vino para los botones -->
-    <color name="boton">#8B1C29</color>
-    
-    <!-- Gris oscuro para los textos, mucho más legible que el negro puro -->
+    <color name="acento">#951432</color>
+    <color name="boton">#951432</color>
     <color name="texto">#333333</color>
-    
-    <!-- Gris plata (del "Chic") para textos secundarios -->
     <color name="textoSuave">#888888</color>
-    
-    <!-- Color para el ícono de la app -->
-    <color name="ic_launcher_background">#8B1C29</color>
+    <color name="ic_launcher_background">#951432</color>
 </resources>

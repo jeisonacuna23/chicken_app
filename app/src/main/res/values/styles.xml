@@ -1,31 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <style name="AppTheme" parent="@android:style/Theme.Material.Light.DarkActionBar">
-        <!-- Barra superior en rojo vino -->
-        <item name="android:colorPrimary">#8B1C29</item>
-        <!-- Barra de estado (donde está la batería y la hora) más oscura -->
-        <item name="android:colorPrimaryDark">#5C0E18</item>
-        <!-- Color de los checkboxes y radios (rosa palo) -->
+        <item name="android:colorPrimary">#951432</item>
+        <item name="android:colorPrimaryDark">#660B20</item>
         <item name="android:colorAccent">#EAA4B1</item>
-        <!-- Fondo general crema -->
         <item name="android:windowBackground">@color/fondo</item>
         <item name="android:textColorPrimary">@color/texto</item>
         <item name="android:textColorSecondary">@color/textoSuave</item>
     </style>
-
     <style name="BotonPrincipal" parent="@android:style/Widget.Material.Button">
-        <!-- Botón rojo vino con texto blanco -->
         <item name="android:backgroundTint">@color/boton</item>
         <item name="android:textColor">#FFFFFF</item>
         <item name="android:textStyle">bold</item>
-        <!-- Un poco de sombra para dar relieve -->
         <item name="android:elevation">2dp</item>
     </style>
-
-    <style name="Titulo" parent="@android:style/Widget.TextView">
-        <item name="android:textColor">@color/acento</item>
-        <item name="android:textStyle">bold</item>
-    </style>
-
 </resources>

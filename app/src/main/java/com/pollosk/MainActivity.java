@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -22,7 +24,6 @@ public class MainActivity extends Activity {
         super.onCreate(b);
         setContentView(R.layout.activity_main);
         
-        // Truco de los 3 toques en el logo grande
         ImageView logo = findViewById(R.id.ivMainLogo);
         logo.setOnClickListener(v -> registrarToque());
 
@@ -38,6 +39,35 @@ public class MainActivity extends Activity {
                 startActivity(new Intent(this, PagadosActivity.class)));
         ((Button) findViewById(R.id.btnResumen)).setOnClickListener(v ->
                 startActivity(new Intent(this, ResumenActivity.class)));
+    }
+
+    // Crea el botón de salir en la barra de arriba
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add(0, 1, 0, "Cerrar Sesión")
+            .setIcon(R.drawable.ic_logout)
+            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        return true;
+    }
+
+    // Escucha el clic en el botón de salir
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == 1) {
+            new AlertDialog.Builder(this)
+                .setTitle("Cerrar Sesión")
+                .setMessage("¿Desea salir de la aplicación?")
+                .setPositiveButton("Sí", (d, w) -> {
+                    SessionManager session = new SessionManager(this);
+                    session.logout();
+                    startActivity(new Intent(this, LoginActivity.class));
+                    finish();
+                })
+                .setNegativeButton("No", null)
+                .show();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void registrarToque() {
