@@ -67,6 +67,13 @@ public class PolloDAO {
         return p;
     }
 
+    // NUEVO MÉTODO: Para editar el peso
+    public void actualizarPeso(long id, double nuevoPeso) {
+        ContentValues cv = new ContentValues();
+        cv.put("peso_kg", nuevoPeso);
+        helper.getWritableDatabase().update("pollos", cv, "id = ?", new String[]{String.valueOf(id)});
+    }
+
     public void marcarVendidos(List<Long> ids, long ventaId) {
         SQLiteDatabase db = helper.getWritableDatabase();
         db.beginTransaction();
@@ -83,11 +90,6 @@ public class PolloDAO {
         }
     }
 
-    /**
-     * Devuelve al inventario todos los pollos asociados a una venta.
-     * Esto corrige el bug de la PWA original donde eliminar una venta
-     * dejaba los pollos marcados como vendidos para siempre.
-     */
     public void devolverAlInventario(long ventaId) {
         ContentValues cv = new ContentValues();
         cv.put("vendido", 0);
@@ -114,7 +116,6 @@ public class PolloDAO {
     }
 
     public void eliminar(long id) {
-        helper.getWritableDatabase().delete("pollos", "id = ?",
-                new String[]{String.valueOf(id)});
+        helper.getWritableDatabase().delete("pollos", "id = ?", new String[]{String.valueOf(id)});
     }
 }

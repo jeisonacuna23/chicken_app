@@ -21,7 +21,7 @@ import java.util.Locale;
 public class InventarioActivity extends Activity {
 
     private PolloDAO dao;
-    private EditText etPeso;
+    private EditText etPeso, etCantidad;
     private ListView lvDisponibles, lvVendidos;
     private TextView tvDisponibles, tvVendidos;
 
@@ -33,6 +33,7 @@ public class InventarioActivity extends Activity {
 
         dao = new PolloDAO(this);
         etPeso = findViewById(R.id.etPeso);
+        etCantidad = findViewById(R.id.etCantidad);
         lvDisponibles = findViewById(R.id.lvDisponibles);
         lvVendidos = findViewById(R.id.lvVendidos);
         tvDisponibles = findViewById(R.id.tvDisponibles);
@@ -40,7 +41,11 @@ public class InventarioActivity extends Activity {
 
         ((Button) findViewById(R.id.btnAgregar)).setOnClickListener(v -> agregar());
 
-        // Mantener pulsado un pollo disponible → confirmar eliminación
+        // Mantener pulsado para eliminar, clic normal para editar
+        lvDisponibles.setOnItemClickListener((parent, view, pos, id) -> {
+            Pollo p = (Pollo) parent.getItemAtPosition(pos);
+            editarPeso(p);
+        });
         lvDisponibles.setOnItemLongClickListener((parent, view, pos, id) -> {
             Pollo p = (Pollo) parent.getItemAtPosition(pos);
             confirmarEliminar(p);
@@ -51,24 +56,69 @@ public class InventarioActivity extends Activity {
     }
 
     private void agregar() {
-        String txt = etPeso.getText().toString().trim().replace(',', '.');
-        if (txt.isEmpty()) { toast("Ingresa el peso en kilos"); return; }
-        double peso;
-        try { peso = Double.parseDouble(txt); }
-        catch (NumberFormatException e) { toast("Peso inválido"); return; }
-        if (peso <= 0) { toast("El peso debe ser mayor a 0"); return; }
+        String txtPeso = etPeso.getText().toString().trim().replace(',', '.');
+        String txtCant = etCantidad.getText().toString().trim();
+        
+        if (txtPeso.isEmpty()) { toast("Ingresa el peso en kilos"); return; }
+        if (txtCant.isEmpty()) { txtCant = "1"; }
 
-        dao.insertar(peso);
+        double peso;
+        int cantidad;
+        try {
+            peso = Double.parseDouble(txtPeso);
+            cantidad = Integer.parseInt(txtCant);
+        } catch (NumberFormatException e) {
+            toast("Peso o cantidad inválidos");
+            return;
+        }
+
+        if (peso <= 0 || cantidad <= 0) {
+            toast("El peso y la cantidad deben ser mayores a 0");
+            return;
+        }
+
+        for (int i = 0; i < cantidad; i++) {
+            dao.insertar(peso);
+        }
+        
         etPeso.setText("");
-        toast("Pollo agregado: " + String.format(Locale.US, "%.3f kg", peso));
+        etCantidad.setText("1");
+        toast(cantidad + " pollo(s) agregado(s) de " + String.format(Locale.US, "%.3f", peso) + " kg");
         refrescar();
+    }
+
+    private void editarPeso(final Pollo p) {
+        final EditText input = new EditText(this);
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        input.setText(String.format(Locale.US, "%.3f", p.pesoKg));
+
+        new AlertDialog.Builder(this)
+            .setTitle("Editar Peso")
+            .setMessage("Modifica el peso de este pollo:")
+            .setView(input)
+            .setPositiveButton("Guardar", (d, w) -> {
+                String val = input.getText().toString().trim().replace(',', '.');
+                try {
+                    double nuevoPeso = Double.parseDouble(val);
+                    if (nuevoPeso > 0) {
+                        dao.actualizarPeso(p.id, nuevoPeso);
+                        refrescar();
+                        toast("Peso actualizado");
+                    } else {
+                        toast("El peso debe ser mayor a 0");
+                    }
+                } catch (Exception e) {
+                    toast("Peso inválido");
+                }
+            })
+            .setNegativeButton("Cancelar", null)
+            .show();
     }
 
     private void confirmarEliminar(final Pollo p) {
         new AlertDialog.Builder(this)
             .setTitle("Eliminar pollo")
-            .setMessage(String.format(Locale.US,
-                    "Se eliminará el pollo de %.3f kg del inventario. ¿Continuar?", p.pesoKg))
+            .setMessage(String.format(Locale.US, "Se eliminará el pollo de %.3f kg. ¿Continuar?", p.pesoKg))
             .setPositiveButton("Sí, eliminar", (d, w) -> {
                 dao.eliminar(p.id);
                 toast("Pollo eliminado");
