@@ -5,11 +5,14 @@ import android.app.AlertDialog;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,6 +28,7 @@ public class DeudasActivity extends Activity {
     private VentaDAO dao;
     private ListView lv;
     private TextView tvVacio;
+    private EditText etBuscar;
 
     @Override
     protected void onCreate(Bundle b) {
@@ -34,6 +38,13 @@ public class DeudasActivity extends Activity {
         dao = new VentaDAO(this);
         lv = findViewById(R.id.lvDeudas);
         tvVacio = findViewById(R.id.tvDeudasVacio);
+        etBuscar = findViewById(R.id.etBuscarDeudas);
+
+        etBuscar.addTextChangedListener(new TextWatcher() {
+            public void beforeTextChanged(CharSequence s, int a, int b, int c) {}
+            public void onTextChanged(CharSequence s, int a, int b, int c) { refrescar(); }
+            public void afterTextChanged(Editable s) {}
+        });
     }
 
     @Override
@@ -43,7 +54,9 @@ public class DeudasActivity extends Activity {
     }
 
     private void refrescar() {
-        List<Venta> lista = dao.listarDeudas();
+        String query = etBuscar.getText().toString().trim();
+        List<Venta> lista = query.isEmpty() ? dao.listarDeudas() : dao.buscarDeudas(query);
+        
         if (lista.isEmpty()) {
             tvVacio.setVisibility(View.VISIBLE);
             lv.setVisibility(View.GONE);
@@ -81,14 +94,10 @@ public class DeudasActivity extends Activity {
         }
     }
 
-    private String formatoCOP(double n) {
-        return String.format(Locale.US, "$%,.0f", n).replace(',', '.');
-    }
+    private String formatoCOP(double n) { return String.format(Locale.US, "$%,.0f", n).replace(',', '.'); }
 
     private class Adaptador extends ArrayAdapter<Venta> {
-        Adaptador(List<Venta> lista) {
-            super(DeudasActivity.this, R.layout.item_deuda, lista);
-        }
+        Adaptador(List<Venta> lista) { super(DeudasActivity.this, R.layout.item_deuda, lista); }
 
         @Override
         public View getView(int pos, View cv, ViewGroup parent) {

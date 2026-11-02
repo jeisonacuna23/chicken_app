@@ -4,11 +4,14 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +32,7 @@ public class HistorialActivity extends Activity {
     private PolloDAO polloDAO;
     private ListView lvHistorial;
     private TextView tvVacio;
+    private EditText etBuscar;
 
     @Override
     protected void onCreate(Bundle b) {
@@ -41,6 +45,13 @@ public class HistorialActivity extends Activity {
         polloDAO = new PolloDAO(this);
         lvHistorial = findViewById(R.id.lvHistorial);
         tvVacio = findViewById(R.id.tvHistorialVacio);
+        etBuscar = findViewById(R.id.etBuscarHistorial);
+
+        etBuscar.addTextChangedListener(new TextWatcher() {
+            public void beforeTextChanged(CharSequence s, int a, int b, int c) {}
+            public void onTextChanged(CharSequence s, int a, int b, int c) { refrescar(); }
+            public void afterTextChanged(Editable s) {}
+        });
     }
 
     @Override
@@ -50,7 +61,9 @@ public class HistorialActivity extends Activity {
     }
 
     private void refrescar() {
-        List<Venta> ventas = ventaDAO.listarTodas();
+        String query = etBuscar.getText().toString().trim();
+        List<Venta> ventas = query.isEmpty() ? ventaDAO.listarTodas() : ventaDAO.buscarTodas(query);
+        
         if (ventas.isEmpty()) {
             tvVacio.setVisibility(View.VISIBLE);
             lvHistorial.setVisibility(View.GONE);
@@ -69,30 +82,22 @@ public class HistorialActivity extends Activity {
                 polloDAO.devolverAlInventario(v.id);
                 itemDAO.eliminarPorVenta(v.id);
                 ventaDAO.eliminar(v.id);
-                toast("Venta eliminada. Pollos devueltos al inventario.");
+                toast("Venta eliminada.");
                 refrescar();
             })
             .setNegativeButton("Cancelar", null)
             .show();
     }
 
-    private void toast(String m) {
-        Toast.makeText(this, m, Toast.LENGTH_SHORT).show();
-    }
-
-    private String formatoCOP(double n) {
-        return String.format(Locale.US, "$%,.0f", n).replace(',', '.');
-    }
+    private void toast(String m) { Toast.makeText(this, m, Toast.LENGTH_SHORT).show(); }
+    private String formatoCOP(double n) { return String.format(Locale.US, "$%,.0f", n).replace(',', '.'); }
 
     private class Adaptador extends ArrayAdapter<Venta> {
-        Adaptador(List<Venta> lista) {
-            super(HistorialActivity.this, R.layout.item_venta, lista);
-        }
+        Adaptador(List<Venta> lista) { super(HistorialActivity.this, R.layout.item_venta, lista); }
 
         @Override
         public View getView(int pos, View cv, ViewGroup parent) {
-            if (cv == null) cv = LayoutInflater.from(getContext())
-                    .inflate(R.layout.item_venta, parent, false);
+            if (cv == null) cv = LayoutInflater.from(getContext()).inflate(R.layout.item_venta, parent, false);
             Venta v = getItem(pos);
 
             ((TextView) cv.findViewById(R.id.tvItemRef)).setText(v.referencia);
@@ -109,8 +114,7 @@ public class HistorialActivity extends Activity {
                 startActivity(i);
             });
 
-            ((Button) cv.findViewById(R.id.btnItemEliminar)).setOnClickListener(x ->
-                    eliminar(v));
+            ((Button) cv.findViewById(R.id.btnItemEliminar)).setOnClickListener(x -> eliminar(v));
 
             return cv;
         }

@@ -3,11 +3,14 @@ package com.pollosk;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -25,6 +28,7 @@ public class PagadosActivity extends Activity {
     private ItemVentaDAO itemDAO;
     private ListView lv;
     private TextView tvVacio;
+    private EditText etBuscar;
 
     @Override
     protected void onCreate(Bundle b) {
@@ -35,6 +39,13 @@ public class PagadosActivity extends Activity {
         itemDAO = new ItemVentaDAO(this);
         lv = findViewById(R.id.lvPagados);
         tvVacio = findViewById(R.id.tvPagadosVacio);
+        etBuscar = findViewById(R.id.etBuscarPagados);
+
+        etBuscar.addTextChangedListener(new TextWatcher() {
+            public void beforeTextChanged(CharSequence s, int a, int b, int c) {}
+            public void onTextChanged(CharSequence s, int a, int b, int c) { refrescar(); }
+            public void afterTextChanged(Editable s) {}
+        });
     }
 
     @Override
@@ -44,7 +55,9 @@ public class PagadosActivity extends Activity {
     }
 
     private void refrescar() {
-        List<Venta> lista = ventaDAO.listarPagadas();
+        String query = etBuscar.getText().toString().trim();
+        List<Venta> lista = query.isEmpty() ? ventaDAO.listarPagadas() : ventaDAO.buscarPagadas(query);
+        
         if (lista.isEmpty()) {
             tvVacio.setVisibility(View.VISIBLE);
             lv.setVisibility(View.GONE);
@@ -55,19 +68,14 @@ public class PagadosActivity extends Activity {
         }
     }
 
-    private String formatoCOP(double n) {
-        return String.format(Locale.US, "$%,.0f", n).replace(',', '.');
-    }
+    private String formatoCOP(double n) { return String.format(Locale.US, "$%,.0f", n).replace(',', '.'); }
 
     private class Adaptador extends ArrayAdapter<Venta> {
-        Adaptador(List<Venta> lista) {
-            super(PagadosActivity.this, R.layout.item_venta, lista);
-        }
+        Adaptador(List<Venta> lista) { super(PagadosActivity.this, R.layout.item_venta, lista); }
 
         @Override
         public View getView(int pos, View cv, ViewGroup parent) {
-            if (cv == null) cv = LayoutInflater.from(getContext())
-                    .inflate(R.layout.item_venta, parent, false);
+            if (cv == null) cv = LayoutInflater.from(getContext()).inflate(R.layout.item_venta, parent, false);
             Venta v = getItem(pos);
 
             ((TextView) cv.findViewById(R.id.tvItemRef)).setText(v.referencia);
@@ -84,7 +92,6 @@ public class PagadosActivity extends Activity {
                 startActivity(i);
             });
 
-            // En Pagados no se elimina desde aquí
             cv.findViewById(R.id.btnItemEliminar).setVisibility(View.GONE);
 
             return cv;

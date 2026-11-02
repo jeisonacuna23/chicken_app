@@ -35,8 +35,7 @@ public class VentaDAO {
     public Venta buscarPorId(long id) {
         Cursor c = helper.getReadableDatabase().rawQuery(
                 "SELECT id, referencia, cliente, precio_kg, metodo_pago, fecha, total " +
-                "FROM ventas WHERE id = ?",
-                new String[]{String.valueOf(id)});
+                "FROM ventas WHERE id = ?", new String[]{String.valueOf(id)});
         Venta v = null;
         if (c.moveToFirst()) v = leer(c);
         c.close();
@@ -44,18 +43,30 @@ public class VentaDAO {
     }
 
     public List<Venta> listarTodas() {
-        return listar("SELECT id, referencia, cliente, precio_kg, metodo_pago, fecha, total " +
-                "FROM ventas ORDER BY id DESC");
+        return listar("SELECT id, referencia, cliente, precio_kg, metodo_pago, fecha, total FROM ventas ORDER BY id DESC");
+    }
+    
+    // NUEVO: Buscar en historial
+    public List<Venta> buscarTodas(String cliente) {
+        return listar("SELECT id, referencia, cliente, precio_kg, metodo_pago, fecha, total FROM ventas WHERE cliente LIKE '%" + cliente + "%' ORDER BY id DESC");
     }
 
     public List<Venta> listarDeudas() {
-        return listar("SELECT id, referencia, cliente, precio_kg, metodo_pago, fecha, total " +
-                "FROM ventas WHERE metodo_pago = '" + Venta.METODO_FIADO + "' ORDER BY id DESC");
+        return listar("SELECT id, referencia, cliente, precio_kg, metodo_pago, fecha, total FROM ventas WHERE metodo_pago = '" + Venta.METODO_FIADO + "' ORDER BY id DESC");
+    }
+    
+    // NUEVO: Buscar en deudas
+    public List<Venta> buscarDeudas(String cliente) {
+        return listar("SELECT id, referencia, cliente, precio_kg, metodo_pago, fecha, total FROM ventas WHERE metodo_pago = '" + Venta.METODO_FIADO + "' AND cliente LIKE '%" + cliente + "%' ORDER BY id DESC");
     }
 
     public List<Venta> listarPagadas() {
-        return listar("SELECT id, referencia, cliente, precio_kg, metodo_pago, fecha, total " +
-                "FROM ventas WHERE metodo_pago != '" + Venta.METODO_FIADO + "' ORDER BY id DESC");
+        return listar("SELECT id, referencia, cliente, precio_kg, metodo_pago, fecha, total FROM ventas WHERE metodo_pago != '" + Venta.METODO_FIADO + "' ORDER BY id DESC");
+    }
+    
+    // NUEVO: Buscar en pagados
+    public List<Venta> buscarPagadas(String cliente) {
+        return listar("SELECT id, referencia, cliente, precio_kg, metodo_pago, fecha, total FROM ventas WHERE metodo_pago != '" + Venta.METODO_FIADO + "' AND cliente LIKE '%" + cliente + "%' ORDER BY id DESC");
     }
 
     private List<Venta> listar(String sql) {
@@ -85,25 +96,21 @@ public class VentaDAO {
         cv.put("metodo_pago", v.metodoPago);
         cv.put("fecha", v.fecha);
         cv.put("total", v.total);
-        helper.getWritableDatabase().update("ventas", cv, "id = ?",
-                new String[]{String.valueOf(v.id)});
+        helper.getWritableDatabase().update("ventas", cv, "id = ?", new String[]{String.valueOf(v.id)});
     }
 
     public void eliminar(long id) {
-        helper.getWritableDatabase().delete("ventas", "id = ?",
-                new String[]{String.valueOf(id)});
+        helper.getWritableDatabase().delete("ventas", "id = ?", new String[]{String.valueOf(id)});
     }
 
     public void marcarComoPagada(long id, String metodo) {
         ContentValues cv = new ContentValues();
         cv.put("metodo_pago", metodo);
-        helper.getWritableDatabase().update("ventas", cv, "id = ?",
-                new String[]{String.valueOf(id)});
+        helper.getWritableDatabase().update("ventas", cv, "id = ?", new String[]{String.valueOf(id)});
     }
 
     public int contarTodas() {
-        Cursor c = helper.getReadableDatabase().rawQuery(
-                "SELECT COUNT(*) FROM ventas", null);
+        Cursor c = helper.getReadableDatabase().rawQuery("SELECT COUNT(*) FROM ventas", null);
         int n = 0;
         if (c.moveToFirst()) n = c.getInt(0);
         c.close();
@@ -112,8 +119,7 @@ public class VentaDAO {
 
     public double sumaPorMetodo(String metodo) {
         Cursor c = helper.getReadableDatabase().rawQuery(
-                "SELECT IFNULL(SUM(total),0) FROM ventas WHERE metodo_pago = ?",
-                new String[]{metodo});
+                "SELECT IFNULL(SUM(total),0) FROM ventas WHERE metodo_pago = ?", new String[]{metodo});
         double n = 0;
         if (c.moveToFirst()) n = c.getDouble(0);
         c.close();
@@ -125,19 +131,13 @@ public class VentaDAO {
         SimpleDateFormat sdf = new SimpleDateFormat("yy", Locale.US);
         sdf.setTimeZone(tz);
         String yy = sdf.format(new Date());
-        
-        // CAMBIO: Ahora genera K26- en vez de VP-K26-
         String prefijo = "K" + yy + "-";
-        
         Cursor c = helper.getReadableDatabase().rawQuery(
-                "SELECT MAX(referencia) FROM ventas WHERE referencia LIKE ?",
-                new String[]{prefijo + "%"});
+                "SELECT MAX(referencia) FROM ventas WHERE referencia LIKE ?", new String[]{prefijo + "%"});
         int siguiente = 1;
         if (c.moveToFirst() && !c.isNull(0)) {
             String max = c.getString(0);
-            try {
-                siguiente = Integer.parseInt(max.substring(prefijo.length())) + 1;
-            } catch (Exception ignored) {}
+            try { siguiente = Integer.parseInt(max.substring(prefijo.length())) + 1; } catch (Exception ignored) {}
         }
         c.close();
         return prefijo + String.format(Locale.US, "%04d", siguiente);
@@ -149,7 +149,6 @@ public class VentaDAO {
         sdf.setTimeZone(tz);
         String yy = sdf.format(new Date());
         String prefijo = "K" + yy + "-";
-        helper.getWritableDatabase().delete("ventas",
-                "referencia LIKE ?", new String[]{prefijo + "%"});
+        helper.getWritableDatabase().delete("ventas", "referencia LIKE ?", new String[]{prefijo + "%"});
     }
 }
