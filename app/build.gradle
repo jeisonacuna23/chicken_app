@@ -46,4 +46,7 @@ dependencies {
     implementation 'androidx.core:core:1.12.0'
     implementation 'androidx.biometric:biometric:1.1.0'
     implementation 'androidx.fragment:fragment:1.6.2'
+    
+    // ESTA LÍNEA ARREGLA EL ERROR: Fuerza a que todo use la misma versión
+    implementation platform('org.jetbrains.kotlin:kotlin-bom:1.8.22')
 }
