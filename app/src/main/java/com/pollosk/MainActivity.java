@@ -27,30 +27,21 @@ public class MainActivity extends Activity {
         ImageView logo = findViewById(R.id.ivMainLogo);
         logo.setOnClickListener(v -> registrarToque());
 
-        ((Button) findViewById(R.id.btnInventario)).setOnClickListener(v ->
-                startActivity(new Intent(this, InventarioActivity.class)));
-        ((Button) findViewById(R.id.btnVender)).setOnClickListener(v ->
-                startActivity(new Intent(this, VenderActivity.class)));
-        ((Button) findViewById(R.id.btnHistorial)).setOnClickListener(v ->
-                startActivity(new Intent(this, HistorialActivity.class)));
-        ((Button) findViewById(R.id.btnDeudas)).setOnClickListener(v ->
-                startActivity(new Intent(this, DeudasActivity.class)));
-        ((Button) findViewById(R.id.btnPagados)).setOnClickListener(v ->
-                startActivity(new Intent(this, PagadosActivity.class)));
-        ((Button) findViewById(R.id.btnResumen)).setOnClickListener(v ->
-                startActivity(new Intent(this, ResumenActivity.class)));
+        ((Button) findViewById(R.id.btnInventario)).setOnClickListener(v -> startActivity(new Intent(this, InventarioActivity.class)));
+        ((Button) findViewById(R.id.btnVender)).setOnClickListener(v -> startActivity(new Intent(this, VenderActivity.class)));
+        ((Button) findViewById(R.id.btnHistorial)).setOnClickListener(v -> startActivity(new Intent(this, HistorialActivity.class)));
+        ((Button) findViewById(R.id.btnDeudas)).setOnClickListener(v -> startActivity(new Intent(this, DeudasActivity.class)));
+        ((Button) findViewById(R.id.btnPagados)).setOnClickListener(v -> startActivity(new Intent(this, PagadosActivity.class)));
+        ((Button) findViewById(R.id.btnResumen)).setOnClickListener(v -> startActivity(new Intent(this, ResumenActivity.class)));
+        ((Button) findViewById(R.id.btnTutorial)).setOnClickListener(v -> startActivity(new Intent(this, TutorialActivity.class)));
     }
 
-    // Crea el botón de salir en la barra de arriba
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, 1, 0, "Cerrar Sesión")
-            .setIcon(R.drawable.ic_logout)
-            .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        menu.add(0, 1, 0, "Cerrar Sesión").setIcon(R.drawable.ic_logout).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
         return true;
     }
 
-    // Escucha el clic en el botón de salir
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == 1) {

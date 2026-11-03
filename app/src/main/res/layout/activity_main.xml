@@ -101,5 +101,20 @@
             android:paddingStart="24dp"
             android:paddingEnd="24dp"
             android:text="Resumen"/>
+
+        <!-- BOTÓN DE TUTORIAL -->
+        <Button
+            android:id="@+id/btnTutorial"
+            style="@style/BotonPrincipal"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="8dp"
+            android:drawableStart="@drawable/ic_tutorial"
+            android:drawableTint="#FFFFFF"
+            android:drawablePadding="16dp"
+            android:gravity="center_vertical|start"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:text="Guía de Uso"/>
     </LinearLayout>
 </ScrollView>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/fondo"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Guía de Uso Rápida"
+            android:textColor="@color/acento"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:paddingBottom="24dp"/>
+
+        <!-- INVENTARIO -->
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="1. Inventario" android:textColor="@color/acento" android:textStyle="bold" android:textSize="18sp"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="• Registra el peso en kilos de los pollos que llegan.\n• Puedes poner una cantidad (ej. 5) para agregar varios del mismo peso de golpe.\n• Toca un pollo de la lista para corregir su peso.\n• Mantén presionado un pollo para eliminarlo si te equivocaste." android:textColor="@color/texto" android:paddingTop="4dp" android:paddingBottom="16dp"/>
+
+        <!-- VENTAS -->
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="2. Registrar Venta" android:textColor="@color/acento" android:textStyle="bold" android:textSize="18sp"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="• Escribe el nombre del cliente.\n• Digita el precio por kilo.\n• Selecciona los pollos que se lleva.\n• Elige el método de pago: Efectivo, Nequi o Fiado (Deuda).\n• Genera el recibo para ver la previa y enviarlo por WhatsApp." android:textColor="@color/texto" android:paddingTop="4dp" android:paddingBottom="16dp"/>
+
+        <!-- HISTORIAL -->
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="3. Historial" android:textColor="@color/acento" android:textStyle="bold" android:textSize="18sp"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="• Aquí están todas las ventas del día.\n• Usa el buscador para encontrar a un cliente por su nombre.\n• Toca 'Editar' para cambiar el precio o el peso de una venta.\n• Toca 'Eliminar' para borrar la venta (los pollos vuelven al inventario).\n• Usa el botón 'Exportar' para guardar todo en Excel y enviarlo por WhatsApp o correo." android:textColor="@color/texto" android:paddingTop="4dp" android:paddingBottom="16dp"/>
+
+        <!-- DEUDAS -->
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="4. Deudas y Pagados" android:textColor="@color/acento" android:textStyle="bold" android:textSize="18sp"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="• En 'Deudas' verás a los clientes que te deben (Fiado).\n• Toca 'Recordar' para enviarles una imagen por WhatsApp con los datos de tu Nequi.\n• Cuando te paguen, toca 'Pagar' y elige si fue en efectivo o Nequi.\n• La venta se moverá automáticamente a la lista de 'Pagados'." android:textColor="@color/texto" android:paddingTop="4dp" android:paddingBottom="16dp"/>
+
+        <!-- RESUMEN Y CIERRE -->
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="5. Resumen y Cierre" android:textColor="@color/acento" android:textStyle="bold" android:textSize="18sp"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="• El 'Resumen' te muestra el dinero en efectivo, Nequi y lo que te deben.\n• 'Finalizar jornada' cierra el día.\n• Para poder cerrar, NO deben quedar pollos en inventario y NO deben haber deudas pendientes.\n• Al cerrar, se borran las ventas del día (se guarda un respaldo en Excel y TXT) y el inventario vuelve a cero para empezar mañana.\n• Puedes ver los cierres de días anteriores desde el mismo Resumen." android:textColor="@color/texto" android:paddingTop="4dp" android:paddingBottom="16dp"/>
+
+        <!-- SEGURIDAD -->
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="6. Seguridad" android:textColor="@color/acento" android:textStyle="bold" android:textSize="18sp"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="• La app pide un PIN numérico al abrir.\n• Si tienes huella dactilar configurada, puedes usarla para entrar más rápido.\n• Si olvidas el PIN, usa tu pregunta de seguridad.\n• Para salir, toca el ícono de la puerta arriba a la derecha." android:textColor="@color/texto" android:paddingTop="4dp" android:paddingBottom="16dp"/>
+
+        <Button
+            android:id="@+id/btnVolverTutorial"
+            style="@style/BotonPrincipal"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
+            android:text="Volver al menú"/>
+    </LinearLayout>
+</ScrollView>
